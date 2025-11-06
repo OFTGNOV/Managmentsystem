@@ -4,23 +4,17 @@ import managmentsystem.database.RouteRepository;
 import org.bson.Document;
 import java.util.List;
 
-/**
- * RouteManager handles delivery route creation and management using MongoDB.
- */
+// RouteManager handles delivery route creation and management using MongoDB.
 public class RouteManager {
     private RouteRepository routeRepository;
     private static int routeCounter = 1;
 
-    /**
-     * Constructor initializes the route repository.
-     */
+    // Constructor initializes the route repository.
     public RouteManager() {
         this.routeRepository = new RouteRepository();
     }
 
-    /**
-     * Creates a new delivery route and returns the route ID.
-     */
+    // Creates a new delivery route and returns the route ID.
     public String createRoute(String vehicleId, String driverId) {
         String routeId = "RT" + String.format("%05d", ++routeCounter);
         routeRepository.createRoute(routeId, vehicleId, driverId);
@@ -28,9 +22,7 @@ public class RouteManager {
         return routeId;
     }
 
-    /**
-     * Retrieves a route document by ID.
-     */
+    // Retrieves a route document by ID.
     public Document getRoute(String routeId) {
         Document route = routeRepository.getRouteById(routeId);
         if (route == null) {
@@ -40,9 +32,7 @@ public class RouteManager {
         return route;
     }
 
-    /**
-     * Adds a shipment to a route.
-     */
+    // Adds a shipment to a route.
     public void addShipmentToRoute(String routeId, String shipmentId) {
         try {
             routeRepository.addShipmentToRoute(routeId, shipmentId);
@@ -52,23 +42,17 @@ public class RouteManager {
         }
     }
 
-    /**
-     * Retrieves all routes for a specific driver as Document list.
-     */
+    // Retrieves all routes for a specific driver as Document list.
     public List<Document> getDriverRoutes(String driverId) {
         return routeRepository.getDriverRoutes(driverId);
     }
 
-    /**
-     * Gets route count for a driver (helper method).
-     */
+    // Gets route count for a driver (helper method)
     public int getDriverRouteCount(String driverId) {
         return getDriverRoutes(driverId).size();
     }
 
-    /**
-     * Completes a route by updating its status.
-     */
+    // Completes a route by updating its status.
     public void completeRoute(String routeId) {
         try {
             routeRepository.completeRoute(routeId);

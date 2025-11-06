@@ -1,9 +1,8 @@
 package managmentsystem.user_customer;
 
-import managmentsystem.database.RouteRepository;
 import managmentsystem.shipment.ShipmentManager;
+import managmentsystem.shipment.ShipmentStatus;
 import managmentsystem.vehicle_routing.RouteManager;
-
 import org.bson.Document;  // ADD THIS IMPORT
 import java.util.List;
 
@@ -21,9 +20,7 @@ public class Driver extends User {
         this.shipmentManager = shipmentManager;
     }
 
-    /**
-     * Driver views their assigned routes and deliveries.
-     */
+    //Driver views their assigned routes and deliveries.
     public void viewAssignedDeliveries() {
         List<Document> routes = routeManager.getDriverRoutes(this.id);
         if (routes.isEmpty()) {
@@ -40,12 +37,10 @@ public class Driver extends User {
         }
     }
 
-    /**
-     * Updates delivery status for a package.
-     */
+    // Updates delivery status for a package.
     public void updateDeliveryStatus(String trackingNumber, String status) {
         try {
-            Shipment.ShipmentStatus newStatus = Shipment.ShipmentStatus.valueOf(status.toUpperCase());
+            ShipmentStatus newStatus = ShipmentStatus.valueOf(status.toUpperCase());
             shipmentManager.updateShipmentStatus(trackingNumber, newStatus);
             System.out.println(name + " updated package " + trackingNumber + " to " + newStatus);
         } catch (IllegalArgumentException e) {

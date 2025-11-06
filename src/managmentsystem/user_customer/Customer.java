@@ -1,7 +1,8 @@
 package managmentsystem.user_customer;
 
 import java.util.List;
-
+import managmentsystem.shipment.Shipment;
+import managmentsystem.billing_payment.Invoice;
 import managmentsystem.billing_payment.InvoiceManager;
 import managmentsystem.shipment.ShipmentManager;
 
@@ -20,9 +21,7 @@ public class Customer extends User {
         this.invoiceManager = invoiceManager;
     }
 
-    /**
-     * Creates a new shipment request.
-     */
+    // Creates a new shipment request.S
     public void createShipmentRequest(String senderAddress, String recipientName, String recipientAddress,
                                       int destinationZone, double weight, double length, double width,
                                       double height, String packageType) {
@@ -40,9 +39,7 @@ public class Customer extends User {
         }
     }
 
-    /**
-     * Tracks a package by tracking number.
-     */
+    // Tracks a package by tracking number.
     public void trackPackage(String trackingNumber) {
         try {
             Shipment shipment = shipmentManager.getShipment(trackingNumber);
@@ -61,9 +58,7 @@ public class Customer extends User {
         }
     }
 
-    /**
-     * Views customer's invoices.
-     */
+    // Views customer's invoices.
     public void viewInvoices() {
         List<Invoice> invoices = invoiceManager.getCustomerInvoices(this.id);
         if (invoices.isEmpty()) {
@@ -79,9 +74,7 @@ public class Customer extends User {
         }
     }
 
-    /**
-     * Pays an invoice.
-     */
+    // Pays an invoice.
     public void payInvoice(String invoiceId, double amount, String paymentMethod) {
         try {
             invoiceManager.processPayment(invoiceId, amount, paymentMethod);

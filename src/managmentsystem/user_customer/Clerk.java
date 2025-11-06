@@ -1,14 +1,13 @@
 package managmentsystem.user_customer;
 
-import java.util.List;
-
+import managmentsystem.shipment.Shipment;
 import managmentsystem.shipment.ShipmentManager;
+import managmentsystem.shipment.ShipmentStatus;
 import managmentsystem.vehicle_routing.RouteManager;
+import managmentsystem.vehicle_routing.Vehicle;
 import managmentsystem.vehicle_routing.VehicleManager;
 
-/**
- * Clerk class handles shipment processing and route assignment.
- */
+// Clerk class handles shipment processing and route assignment.
 public class Clerk extends User {
     private ShipmentManager shipmentManager;
     private VehicleManager vehicleManager;
@@ -22,9 +21,7 @@ public class Clerk extends User {
         this.routeManager = routeManager;
     }
 
-    /**
-     * Processes a shipment and assigns it to a vehicle/route.
-     */
+    // Processes a shipment and assigns it to a vehicle/route.
     public void processShipment(String trackingNumber, String vehicleId, String routeId) {
         try {
             Shipment shipment = shipmentManager.getShipment(trackingNumber);
@@ -43,7 +40,7 @@ public class Clerk extends User {
             routeManager.addShipmentToRoute(routeId, trackingNumber);
 
             // Update shipment status
-            shipmentManager.updateShipmentStatus(trackingNumber, Shipment.ShipmentStatus.ASSIGNED);
+            shipmentManager.updateShipmentStatus(trackingNumber, ShipmentStatus.ASSIGNED);
 
             System.out.println(name + " processed shipment " + trackingNumber + " and assigned to vehicle " + vehicleId);
         } catch (IllegalArgumentException e) {
@@ -51,9 +48,7 @@ public class Clerk extends User {
         }
     }
 
-    /**
-     * Views vehicle capacity and utilization.
-     */
+    //Views vehicle capacity and utilization.
     public void checkVehicleCapacity(String vehicleId) {
         try {
             Vehicle vehicle = vehicleManager.getVehicle(vehicleId);
