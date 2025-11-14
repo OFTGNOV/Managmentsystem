@@ -2,17 +2,32 @@ package managmentsystem.user_customer;
 
 public class User {
 	protected String id;
-    protected String name;
+    protected String Fname;
+    protected String Lname;
     protected String email;
     protected String password;
+    protected UserRole role;
     
-    // Paramatized Contsturctor
-    public User(String id, String name, String email, String password) {
+    
+    ///Paramatized Contsturctor
+    public User(String id, String Fname, String Lname, String email, String password) {
         this.id = id;
-        this.name = name;
+        this.Fname = Fname;
+        this.Lname = Lname;
         this.email = email;
         this.password = password;
+        this.role = UserRole.UNDEFINED; // Default role
     }
+    
+    //Copy Constructor
+    public User(User other) {
+		this.id = other.id;
+		this.Fname = other.Fname;
+		this.Lname = other.Lname;
+		this.email = other.email;
+		this.password = other.password;
+		this.role = other.role;
+	}
 
 	public String getId() {
 		return id;
@@ -23,11 +38,11 @@ public class User {
 	}
 
 	public String getName() {
-		return name;
+		return Fname;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.Fname = name;
 	}
 
 	public String getEmail() {
@@ -45,16 +60,13 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-    
-//    // Common user actions
-//    public void login() {
-//        System.out.println(name + " logged in successfully.");
-//    }
-//
-//    public void logout() {
-//        System.out.println(name + " logged out.");
-//    }
-
-    // Getters and setters
-    
+	
+   	public UserRole getRole() {
+		return role;
+	}
+   	
+   	public void setRole(UserRole role) {
+   		this.role = role;
+   	}
+   	
 }
