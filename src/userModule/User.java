@@ -2,57 +2,94 @@ package userModule;
 
 
 public class User {
+	protected int ID;
     protected String Fname;
     protected String Lname;
     protected String email;
-    protected String password;
+    protected String passwordHash;
+    // Salt is used for unique hashing. Means even if two users have the same password, their hashes will differ.
+    protected String salt; 
     
     ///Paramatized Contsturctor
     public User(String Fname, String Lname, String email, String password) {
+    	this.ID = ID;
         this.Fname = Fname;
         this.Lname = Lname;
         this.email = email;
-        this.password = password;
+        // hash and store the provided password (can be null)
+        setPassword(password);
     }
     
     //copy constructor
     public User(User other) {
-		this.Fname = other.Fname;
-		this.Lname = other.Lname;
-		this.email = other.email;
-		this.password = other.password;
-	}
+        this.Fname = other.Fname;
+        this.Lname = other.Lname;
+        this.email = other.email;
+        this.passwordHash = other.passwordHash;
+        this.salt = other.salt;
+     
+    }
+    
+    // Simple helpers that use PasswordHasher (PBKDF2) defined in the same package.
+    public void setPassword(String password) {
+        if (password == null) {
+            this.passwordHash = null;
+            this.salt = null;
+            return;
+        }
+        // generate salt and hash
+        String newSalt = PasswordHasher.generateSaltBase64();
+        byte[] saltBytes = java.util.Base64.getDecoder().decode(newSalt);
+        String hash = PasswordHasher.hashPassword(password.toCharArray(), saltBytes);
+        this.salt = newSalt;
+        this.passwordHash = hash;
+    }
+    
+    public boolean verifyPassword(String attemptedPassword) {
+        if (attemptedPassword == null || this.passwordHash == null || this.salt == null) return false;
+        return PasswordHasher.verifyPassword(attemptedPassword.toCharArray(), this.salt, this.passwordHash);
+    }
     
     public String ToString() {
-		return 	", \nFirst Name: " + Fname + 
-				", \nLast Name " + Lname + 
-				", \nEmail: " + email + 
-				", \nPassword: " + password;
-	}
+        return  ", \nFirst Name: " + Fname + 
+                ", \nLast Name " + Lname + 
+                ", \nEmail: " + email + 
+                ", \nPasswordHash: " + passwordHash +
+                ", \nSalt: " + salt;
+    }
 
     // Getters and Setters
-	public String getName() {
-		return Fname;
+    public int getID() {
+		return ID;
 	}
+    
+    public void setID(int ID) {
+    	this.ID = ID;
+    }
+    
+    public String getName() {
+        return Fname;
+    }
 
-	public void setName(String name) {
-		this.Fname = name;
-	}
+    public void setName(String name) {
+        this.Fname = name;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    // Expose only hash (avoid returning raw password)
+    public String getPasswordHash() {
+        return passwordHash;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
-   	
+    public String getSalt() {
+        return salt;
+    }
+    
 }

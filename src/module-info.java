@@ -4,4 +4,6 @@ module Managmentsystem {
 	exports userModule;
 	exports vehicleAndRoutingModule;
 	exports databaseModule;
+	requires java.desktop;
+	requires java.sql;
 }

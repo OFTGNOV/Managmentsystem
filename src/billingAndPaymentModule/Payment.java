@@ -21,25 +21,11 @@ public class Payment {
         this.paymentDate = LocalDateTime.now();
         this.pStatus = pStatus;
     }
-
-    public void markAsSuccessful() {
-        this.transactionStatus = "successful";
-    }
-
-    public void markAsFailed() {
-        this.transactionStatus = "failed";
-    }
-
-    // Getters
-    public String getPaymentId() { return paymentId; }
-    public String getInvoiceId() { return invoiceId; }
-    public double getAmount() { return amount; }
-    public String getPaymentMethod() { return paymentMethod; }
-    public LocalDateTime getPaymentDate() { return paymentDate; }
-    public String getTransactionStatus() { return transactionStatus; }
-
+    
     @Override
     public String toString() {
-        return String.format("Payment #%s - $%.2f [%s]", paymentId, amount, transactionStatus);
+        return String.format("Payment #%s - $%.2f [%s]", paymentId, amount, pStatus);
     }
+    
+    
 }

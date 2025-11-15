@@ -1,12 +1,25 @@
 package userModule;
 
 public class Manager extends User {
-	private String id;
+	private String mngID; // Manager ID
 	
 	//Parameterized Constructor
 	public Manager(String Fname,String Lname, String email, String password) {
 		super(Fname, Lname, email, password);
-		this.id = "MNG-" + Math.floor(Math.random() * 10000); // Generating a random ID for Manager
+		this.generateMngID();
+	}
+	
+	private void generateMngID() {
+		this.mngID = "MNG-" + (int)Math.floor(Math.random() * 10000);
+	}
+	
+	public void generateMngID(String userId) {
+		if (userId == null) {
+			// if null provided, fall back to random id
+			generateMngID();
+			return;
+		}
+		this.mngID = "mng" + userId;
 	}
 	
 	//Copy Constructor

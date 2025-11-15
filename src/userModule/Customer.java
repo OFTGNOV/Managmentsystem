@@ -1,7 +1,7 @@
 package userModule;
 
 public class Customer extends User {
-	private String id;
+	private String custID;
 	private String address;
 	private int zone;
 	
@@ -9,7 +9,8 @@ public class Customer extends User {
 	//Parameterized Constructor
 	public Customer(String Fname,String Lname, String email, String password, String address, int zone) {
 		super(Fname, Lname, email, password);
-		this.id = "CST-" + Math.floor(Math.random() * 10000); // Generating a random ID for Customer
+		// generate a fallback id by default (can be overwritten by generateCustID(usedId))
+		this.generateCustID();
 		this.address = address;
 		this.zone = zone;
 	}
@@ -17,24 +18,41 @@ public class Customer extends User {
 	//Copy Constructor
 	public Customer(Customer other) {
 		super(other);
-		this.id = other.id;
+		this.custID = other.custID;
 		this.address = other.address;
 		this.zone = other.zone;
 	}
 	
+	private void generateCustID() {
+		// fallback id generation similar to other user subclasses
+		this.custID = "CST-" + (int)Math.floor(Math.random() * 10000);
+	}
+
+	// The requested method: prefix "cust" to a provided used ID to create the customer id
+	public void generateCustID(String userId) {
+		if (userId == null) {
+			// if null provided, fall back to random id
+			generateCustID();
+			return;
+		}
+		this.custID = "cust" + userId;
+	}
+	
+	@Override
 	public String ToString() {
 		return super.ToString() + 
-				", \nCustomer ID: " + id + 
+				", \nCustomer ID: " + custID + 
 				", \nAddress: " + address +
 				", \nZone: " + zone + "\n";
 	}
 	
+	//getters and setters
 	public String getId() {
-		return id;
+		return custID;
 	}
 	
 	public void setId(String id) {
-		this.id = id;
+		this.custID = id;
 	}
 	
 	public String getAddress() {
