@@ -1,6 +1,4 @@
-package gui;
-
-import 
+package gui; 
 
 public class LoginWindow {
 

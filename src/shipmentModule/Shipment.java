@@ -1,13 +1,12 @@
 package shipmentModule;
 
 import java.time.LocalDateTime;
+import userModule.Customer;
 
 public class Shipment {
 	private String trackingNumber;
-    private String senderId;
-    private String senderName;        
-    private String senderAddress;     
-    private int destinationZone;
+    private Customer sender;
+    private Customer recipent;            
     private double weight; //weight is in Kilograms
     private double length;     
     private double width;  //width, length and height are in Centimetes       
@@ -18,32 +17,26 @@ public class Shipment {
     private LocalDateTime createdDate;
     private LocalDateTime deliveredDate;
 
+
     // Paramtized Constructor
-    public Shipment(String senderId, String senderName, String senderAddress,
-                    int destinationZone, double weight, double length, double width, 
-                    double height, PackageType pType) {
-    	
+    public Shipment(Customer sender, Customer recipent, double weight, 
+    				double length, double width, double height, PackageType pType) {
     	this.trackingNumber = generateTrackingNumber();
-        this.senderId = senderId; 
-        this.senderName = senderName;
-        this.senderAddress = senderAddress;
-        this.destinationZone = destinationZone;
+        this.sender = sender; 
+        this.recipent = recipent;
         this.weight = weight;
         this.length = length;
         this.width = width;
         this.height = height;
         this.pType = pType;
         this.status = ShipmentStatus.PENDING;
+        this.shippingCost = calculateShippingCost();
         this.createdDate = LocalDateTime.now();
     }
     
     // Copy Constructor
     public Shipment(Shipment other) {
     	this.trackingNumber = other.trackingNumber;
-    	this.senderId = other.senderId; 
-		this.senderName = other.senderName;
-		this.senderAddress = other.senderAddress;
-		this.destinationZone = other.destinationZone;
 		this.weight = other.weight;
 		this.length = other.length;
 		this.width = other.width;
@@ -55,46 +48,62 @@ public class Shipment {
 		this.deliveredDate = other.deliveredDate;
     }
 
-    /* 
-     * Calculates shipping cost based on weight, destination zone, 
-     * and package type then sets the shippingCost attribute
-     */
-    public void calculateShippingCost() {
+    /* Calculates shipping cost based on weight, destination zone, 
+     * and package type then sets the shippingCost attribute */
+    public double calculateShippingCost() {
         double baseCost = 5.0;
         double weightCost = weight * 0.50;
-        double zoneCost = getZoneDistance() * 0.01;
-        double Upcharge = 0; //Upcharge for express and fragile packages
-
+        double zoneCost = getZoneDistance() * 0.10;
+        double Upcharge = 0; 
+        //Upcharge for express and fragile packages
         if (pType == PackageType.EXPRESS) {
             Upcharge = 15.0;
         } else if (pType == PackageType.FRAGILE) {
             Upcharge = 10.0;
         }
 
-        this.shippingCost = baseCost + weightCost + zoneCost + Upcharge;
+        return baseCost + weightCost + zoneCost + Upcharge;
     }
     
     //Randomly Generate a Tracking Number
-    public static String generateTrackingNumber() {
+    public String generateTrackingNumber() {
 		StringBuilder sb = new StringBuilder("TRK");
-		for (int i = 0; i < 10; i++) {
+		// Generate 10 random digits
+		for (int i = 0; i < 5; i++) {
 			sb.append((int)(Math.random() * 10));
 		}
+		
+		if (pType == PackageType.EXPRESS ) {
+			sb.append("EX");
+		} else if (pType == PackageType.FRAGILE) {
+			sb.append("FR");
+		} else {
+			sb.append("ST");
+		}
+			
 		return sb.toString();
 	}
 
     
     // Returns a random distance based on the destination zone
     private double getZoneDistance() {
-        switch (destinationZone) {
-            case 1: return 10 + Math.random() * 15;
-            case 2: return 25 + Math.random() * 25;
-            case 3: return 50 + Math.random() * 50;
-            case 4: return 100 + Math.random() * 100;
-            default: return 0;
-        }
+    	int zone = recipent.getZone();
+		switch (zone) {
+			case 1:
+				return Math.random() * 50.0; //
+			case 2:
+				return Math.random() * 100.0;
+			case 3:
+				return Math.random() * 200.0;
+			case 4:
+				return Math.random() * 300.0;
+			default:
+				return 0.0;
+		}
+    	
     }
 
+    // Updates the shipment status and sets delivered date if applicable
     public void updateStatus(ShipmentStatus newStatus) {
         this.status = newStatus;
         if (newStatus == ShipmentStatus.DELIVERED) {
@@ -105,19 +114,17 @@ public class Shipment {
     @Override
 	public String toString() {
 		return "Shipment - trackingNumber=" + trackingNumber + 
-				", \nsenderId=" + senderId + 
-				", \nsenderName=" + senderName +
-				", \nsenderAddress=" + senderAddress + 
-				", \ndestinationZone=" + destinationZone + 
-				", \nweight=" + weight + 
-				"kg, \nlength=" + length + 
-				"cm, \nwidth=" + width + 
-				"cm, \nheight=" + height + 
-				"cm, \nPackage Type=" + pType + 
-				", \nStatus=" + status + 
-				", \nShipping Cost=" + shippingCost + 
-				", \nCreated Date=" + createdDate + 
-				", \nDelivered Date=" + deliveredDate;
+				", \nSender: " + sender.getId()+ 
+				", \nRecipent: " + recipent.getId() +
+				", \nweight: " + weight + 
+				"kg, \nlength: " + length + 
+				"cm, \nwidth: " + width + 
+				"cm, \nheight: " + height + 
+				"cm, \nPackage Type: " + pType + 
+				", \nStatus: " + status + 
+				String.format(", \nShipping Cost: $%.2f", shippingCost) +  
+				", \nCreated Date: " + createdDate + 
+				", \nDelivered Date: " + deliveredDate;
 	}
     
     //Getters and Setters
@@ -128,37 +135,21 @@ public class Shipment {
 	public void setTrackingNumber(String trackingNumber) {
 		this.trackingNumber = trackingNumber;
 	}
-
-	public String getSenderId() {
-		return senderId;
+	
+	public Customer getSender() {
+		return sender;
 	}
-
-	public void setSenderId(String senderId) {
-		this.senderId = senderId;
+	
+	public void setSender(Customer sender) {
+		this.sender = sender;
 	}
-
-	public String getSenderName() {
-		return senderName;
+	
+	public Customer getRecipent() {
+		return recipent;
 	}
-
-	public void setSenderName(String senderName) {
-		this.senderName = senderName;
-	}
-
-	public String getSenderAddress() {
-		return senderAddress;
-	}
-
-	public void setSenderAddress(String senderAddress) {
-		this.senderAddress = senderAddress;
-	}
-
-	public int getDestinationZone() {
-		return destinationZone;
-	}
-
-	public void setDestinationZone(int destinationZone) {
-		this.destinationZone = destinationZone;
+	
+	public void setRecipent(Customer recipent) {
+		this.recipent = recipent;
 	}
 
 	public double getWeight() {

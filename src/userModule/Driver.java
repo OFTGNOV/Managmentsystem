@@ -17,7 +17,7 @@ public class Driver extends User {
 	
 	public String ToString() {
 		return super.ToString() + 
-				", \nDriver ID: " + id;
+				", \nDriver ID: " + id + "\n";
 	}
 	
 	public String getId() {

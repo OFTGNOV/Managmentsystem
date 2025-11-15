@@ -17,7 +17,7 @@ public class Manager extends User {
 	
 	public String ToString() {
 		return super.ToString() + 
-				", \nManager ID: " + id;
+				", \nManager ID: " + id + "\n";
 	}
 	
 	public String getId() {

@@ -17,7 +17,7 @@ public class Clerk extends User {
 	
 	public String ToString() {
 		return super.ToString() + 
-				", \nClerk ID: " + id;
+				", \nClerk ID: " + id + "\n";
 	}
 	
 	public String getId() {

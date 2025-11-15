@@ -1,10 +1,12 @@
 package vehicleAndRoutingModule;
 
-/*
- * Vehicle class represents a delivery vehicle in the SmartShip fleet.
+import userModule.Driver;
+
+/* Vehicle class represents a delivery vehicle in the SmartShip fleet.
  * Tracks capacity limits and current load.
 */
 public class Vehicle {
+	private Driver assignedDriver; // Driver assigned to this vehicle
     private String licensePlate;
     private String vehicleType; // van, truck, car, bike,
     private double maxWeightCapacity; // in kg
@@ -14,7 +16,10 @@ public class Vehicle {
     private boolean isAvailable;
 
     // Parametrized Constructor
-    public Vehicle(String licensePlate, String vehicleType, double maxWeightCapacity, int maxPackageCapacity) {
+    public Vehicle(Driver assignedDriver, String licensePlate, String vehicleType,
+    				double maxWeightCapacity, int maxPackageCapacity) {
+    	
+    	this.assignedDriver = assignedDriver;
         this.licensePlate = licensePlate;
         this.vehicleType = vehicleType;
         this.maxWeightCapacity = maxWeightCapacity;
@@ -69,13 +74,14 @@ public class Vehicle {
 
     @Override
     public String toString() {
-        return "License Plate: " + licensePlate + 
+        return "Assigned Driver: " + assignedDriver.getId() +
+        		", \nLicense Plate: " + licensePlate + 
         		", \nVehicle Type: " + vehicleType + 
         		", \nMax Weight Capacity: " + maxWeightCapacity + 
         		"kg, \nMax Package Capacity: " + maxPackageCapacity + 
 				"kg, \nCurrent Vehcicle Weight: " + currentWeight + 
 				"kg, \nCurrent Package Count: " + currentPackageCount + 
-				", \nIs Vehcile Available: " + isAvailable;
+				", \nIs This Vehcile Available: " + isAvailable;
     }
     
     

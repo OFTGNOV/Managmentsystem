@@ -2,12 +2,10 @@ package userModule;
 
 
 public class User {
-	protected String id;
     protected String Fname;
     protected String Lname;
     protected String email;
     protected String password;
-    protected UserRole role;
     
     ///Paramatized Contsturctor
     public User(String Fname, String Lname, String email, String password) {
@@ -26,23 +24,13 @@ public class User {
 	}
     
     public String ToString() {
-		return "User ID: " + id + 
-				", \nFirst Name: " + Fname + 
+		return 	", \nFirst Name: " + Fname + 
 				", \nLast Name " + Lname + 
 				", \nEmail: " + email + 
-				", \nPassword: " + password +
-				", \nRole: " + role;
+				", \nPassword: " + password;
 	}
 
     // Getters and Setters
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
 	public String getName() {
 		return Fname;
 	}
@@ -66,13 +54,5 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-   	public UserRole getRole() {
-		return role;
-	}
-   	
-   	public void setRole(UserRole role) {
-   		this.role = role;
-   	}
    	
 }
