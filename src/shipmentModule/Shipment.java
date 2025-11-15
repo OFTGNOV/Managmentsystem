@@ -8,7 +8,7 @@ public class Shipment {
     private String senderName;        
     private String senderAddress;     
     private int destinationZone;
-    private double weight; //grams
+    private double weight; //weight is in Kilograms
     private double length;     
     private double width;  //width, length and height are in Centimetes       
     private double height;            
@@ -110,10 +110,10 @@ public class Shipment {
 				", \nsenderAddress=" + senderAddress + 
 				", \ndestinationZone=" + destinationZone + 
 				", \nweight=" + weight + 
-				", \nlength=" + length + 
-				", \nwidth=" + width + 
-				", \nheight=" + height + 
-				", \nPackage Type=" + pType + 
+				"kg, \nlength=" + length + 
+				"cm, \nwidth=" + width + 
+				"cm, \nheight=" + height + 
+				"cm, \nPackage Type=" + pType + 
 				", \nStatus=" + status + 
 				", \nShipping Cost=" + shippingCost + 
 				", \nCreated Date=" + createdDate + 

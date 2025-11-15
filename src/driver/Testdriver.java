@@ -1,17 +1,19 @@
 package driver;
 
-import userModule.*;
 import shipmentModule.PackageType;
 import shipmentModule.Shipment;
+import userModule.*;
+import vehicleAndRoutingModule.Vehicle;
 
 public class Testdriver {
 	public static void main(String[] args) {
-		userTest();
+		//userTest();
 		//shipmentTest();
+		vehicleTest();
 	}
 	
-	public static void userTest() {
-		User u1 = new User("Alice", "Smith", "alice1@gmail.com", "alice123", UserRole.CUSTOMER);
+	public static void managerTest() {
+		Manager m1 = new User("Alice", "Smith", "alice1@gmail.com", "alice123");
 		System.out.println(u1.ToString());
 	}
 
@@ -21,6 +23,12 @@ public class Testdriver {
 		
 		s1.calculateShippingCost();
 		System.out.println(s1.toString());
+	}
+	
+	public static void vehicleTest() {
+		Vehicle v1 = new Vehicle("ABC123", "Truck", 1000.0, 10);
+		System.out.println("Initial Vehicle State: \n\t" + v1.toString());
+		
 	}
 	
 

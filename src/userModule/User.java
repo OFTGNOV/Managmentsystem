@@ -1,6 +1,5 @@
 package userModule;
 
-import java.util.UUID;
 
 public class User {
 	protected String id;
@@ -10,25 +9,20 @@ public class User {
     protected String password;
     protected UserRole role;
     
-    
     ///Paramatized Contsturctor
-    public User(String Fname, String Lname, String email, String password, UserRole role) {
-        this.id = UUID.randomUUID().toString(); // Generate a unique ID
+    public User(String Fname, String Lname, String email, String password) {
         this.Fname = Fname;
         this.Lname = Lname;
         this.email = email;
         this.password = password;
-        this.role = role;
     }
     
     //copy constructor
     public User(User other) {
-		this.id = other.id;
 		this.Fname = other.Fname;
 		this.Lname = other.Lname;
 		this.email = other.email;
 		this.password = other.password;
-		this.role = other.role;
 	}
     
     public String ToString() {
@@ -40,6 +34,7 @@ public class User {
 				", \nRole: " + role;
 	}
 
+    // Getters and Setters
 	public String getId() {
 		return id;
 	}
