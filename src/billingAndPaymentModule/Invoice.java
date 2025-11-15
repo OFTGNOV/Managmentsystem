@@ -1,4 +1,4 @@
-package managmentsystem.billing_payment;
+package billingAndPaymentModule;
 
 import java.time.LocalDateTime;
 

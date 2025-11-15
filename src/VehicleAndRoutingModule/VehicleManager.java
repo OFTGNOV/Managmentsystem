@@ -1,4 +1,4 @@
-package managmentsystem.vehicle_routing;
+package VehicleAndRoutingModule;
 
 import java.util.ArrayList;
 import java.util.HashMap;

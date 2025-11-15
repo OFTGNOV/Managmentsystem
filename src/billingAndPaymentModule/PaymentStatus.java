@@ -1,4 +1,4 @@
-package managmentsystem.billing_payment;
+package billingAndPaymentModule;
 
 public enum PaymentStatus {
 	UNPAID, PARTIALLY_PAID, PAID

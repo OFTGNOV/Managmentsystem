@@ -1,4 +1,4 @@
-package managmentsystem.database;
+package databaseModule;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;

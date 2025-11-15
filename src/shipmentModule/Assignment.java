@@ -1,4 +1,4 @@
-package managmentsystem.shipment;
+package shipmentModule;
 
 import java.time.LocalDateTime;
 

@@ -1,4 +1,4 @@
-package managmentsystem.vehicle_routing;
+package VehicleAndRoutingModule;
 
 /*
  * Vehicle class represents a delivery vehicle in the SmartShip fleet.

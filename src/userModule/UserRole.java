@@ -1,4 +1,4 @@
-package managmentsystem.user_customer;
+package userModule;
 
 public enum UserRole {
 	//Customers can create accounts, log in, and request shipments.

@@ -1,4 +1,6 @@
-package managmentsystem.user_customer;
+package userModule;
+
+import java.util.UUID;
 
 public class User {
 	protected String id;
@@ -10,16 +12,16 @@ public class User {
     
     
     ///Paramatized Contsturctor
-    public User(String id, String Fname, String Lname, String email, String password) {
-        this.id = id;
+    public User(String Fname, String Lname, String email, String password, UserRole role) {
+        this.id = UUID.randomUUID().toString(); // Generate a unique ID
         this.Fname = Fname;
         this.Lname = Lname;
         this.email = email;
         this.password = password;
-        this.role = UserRole.UNDEFINED; // Default role
+        this.role = role;
     }
     
-    //Copy Constructor
+    //copy constructor
     public User(User other) {
 		this.id = other.id;
 		this.Fname = other.Fname;
@@ -27,6 +29,15 @@ public class User {
 		this.email = other.email;
 		this.password = other.password;
 		this.role = other.role;
+	}
+    
+    public String ToString() {
+		return "User ID: " + id + 
+				", \nFirst Name: " + Fname + 
+				", \nLast Name " + Lname + 
+				", \nEmail: " + email + 
+				", \nPassword: " + password +
+				", \nRole: " + role;
 	}
 
 	public String getId() {
