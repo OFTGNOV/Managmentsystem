@@ -4,23 +4,34 @@ import shipmentModule.PackageType;
 import shipmentModule.Shipment;
 import userModule.*;
 import vehicleAndRoutingModule.Vehicle;
+import billingAndPaymentModule.*;
 
+// Uncommented test driver for various modules
 public class Testdriver {
 	public static void main(String[] args) {
 		// Shipment Module Tests
 		//Customer sender = new Customer("Gem", "Gray", "graygem@gmail.com", "gem123", "789 Gotham St", 3);
 		//Customer recipent = new Customer("Harry", "Potter", "hpotter@gmail.com", "harry123", "101 Hogwarts Rd", 4);
 		//shipmentTest(sender, recipent);
+	
 		
 		// Vehicle Module Tests
-		Driver assignedDriver = new Driver("Claude", "Denver", "cldenver@gmail.com", "claude123");
-		vehicleTest(assignedDriver);
+		//Driver assignedDriver = new Driver("Claude", "Denver", "cldenver@gmail.com", "claude123");
+		//vehicleTest(assignedDriver);
 		
 		// User Module Tests
 //		managerTest();
 //		driverTest();
 //		clerkTest();
 //		customerTest();
+		
+		// Billing and Payment Module Tests
+		Customer c1 = new Customer("Earl", "Gray", "earl@gmail.com", "earl123", "123 Baker St", 1);
+		Customer c2 = new Customer("Nevil", "Long", "nevil@gmail.com", "nevil123", "234 Diagon Alley", 2);
+		Shipment s1 = new Shipment(c1, c2, 3.0, 10.0, 5.0, 2.0, PackageType.STANDARD);
+		Invoice inv1 = new Invoice(PaymentStatus.UNPAID, 100.0, s1, c1);
+		System.out.println(inv1.toString());
+		
 	}
 	
 	public static void managerTest() {

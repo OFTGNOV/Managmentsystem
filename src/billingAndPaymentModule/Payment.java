@@ -11,7 +11,7 @@ public class Payment {
     private double amount;
     private String paymentMethod; // cash, card
     private LocalDateTime paymentDate;
-    private String transactionStatus; // successful, pending, failed
+    private PaymentStatus pStatus; // successful, pending, failed
 
     public Payment(String paymentId, String invoiceId, double amount, String paymentMethod) {
         this.paymentId = paymentId;
@@ -19,7 +19,7 @@ public class Payment {
         this.amount = amount;
         this.paymentMethod = paymentMethod;
         this.paymentDate = LocalDateTime.now();
-        this.transactionStatus = "pending";
+        this.pStatus = pStatus;
     }
 
     public void markAsSuccessful() {
