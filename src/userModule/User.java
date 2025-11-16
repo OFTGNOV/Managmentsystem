@@ -45,6 +45,7 @@ public class User {
         this.passwordHash = hash;
     }
     
+    // Verifies an attempted password against the stored hash
     public boolean verifyPassword(String attemptedPassword) {
         if (attemptedPassword == null || this.passwordHash == null || this.salt == null) return false;
         return PasswordHasher.verifyPassword(attemptedPassword.toCharArray(), this.salt, this.passwordHash);
@@ -67,12 +68,20 @@ public class User {
     	this.ID = ID;
     }
     
-    public String getName() {
+    public String getFirstName() {
         return Fname;
     }
 
-    public void setName(String name) {
+    public void setFirstName(String name) {
         this.Fname = name;
+    }
+
+    public String getLastName() {
+        return Lname;
+    }
+
+    public void setLastName(String lastName) {
+        this.Lname = lastName;
     }
 
     public String getEmail() {
@@ -90,6 +99,13 @@ public class User {
 
     public String getSalt() {
         return salt;
+    }
+
+    // Package-private helper so DAO in a different package cannot call it; however still accessible
+    // within the module if classes are in same runtime. We make it public for simplicity.
+    public void setPasswordHashAndSalt(String passwordHash, String salt) {
+        this.passwordHash = passwordHash;
+        this.salt = salt;
     }
     
 }
