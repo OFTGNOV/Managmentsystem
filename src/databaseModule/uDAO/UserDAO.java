@@ -1,4 +1,4 @@
-package databaseModule;
+package databaseModule.uDAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import userModule.User;
 import javax.swing.JOptionPane;
+
+import databaseModule.DBHelper;
 
 // Data Access Object for User entity
 public class UserDAO {

@@ -1,4 +1,4 @@
-package databaseModule;
+package databaseModule.uDAO;
 
 import userModule.Customer;
 import java.sql.Connection;
@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+
+import databaseModule.DBHelper;
 
 public class CustomerDAO {
 	//Insert Customer Record with parameters
