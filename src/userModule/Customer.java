@@ -25,7 +25,7 @@ public class Customer extends User {
 	
 	private void generateCustID() {
 		// fallback id generation similar to other user subclasses
-		this.custID = "CST-" + (int)Math.floor(Math.random() * 10000);
+		this.custID = "CUST-" + (int)Math.floor(Math.random() * 10000);
 	}
 
 	// The requested method: prefix "cust" to a provided used ID to create the customer id
@@ -35,7 +35,7 @@ public class Customer extends User {
 			generateCustID();
 			return;
 		}
-		this.custID = "cust" + userId;
+		this.custID = "cust" + userId + "-" + super.getLastName().toLowerCase();
 	}
 	
 	@Override
@@ -47,11 +47,11 @@ public class Customer extends User {
 	}
 	
 	//getters and setters
-	public String getId() {
+	public String getCustId() {
 		return custID;
 	}
 	
-	public void setId(String id) {
+	public void setCustId(String id) {
 		this.custID = id;
 	}
 	

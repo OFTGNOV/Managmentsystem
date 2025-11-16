@@ -1,7 +1,7 @@
 package userModule;
 
 public class Clerk extends User {
-	private String clerkID;
+	private String clkID;
 	
 	//Parameterized Constructor
 	public Clerk(String Fname,String Lname, String email, String password) {
@@ -10,7 +10,7 @@ public class Clerk extends User {
 	}
 	
 	private void generateClerkID() {
-		this.clerkID = "CLK-" + (int)Math.floor(Math.random() * 10000);
+		this.clkID = "CLK-" + (int)Math.floor(Math.random() * 10000);
 	}
 	
 	public void generateClerkID(String userId) {
@@ -19,26 +19,26 @@ public class Clerk extends User {
 			generateClerkID();
 			return;
 		}
-		this.clerkID = "clk" + userId;
+		this.clkID = "clk" + userId + "-" + super.getLastName().toLowerCase();
 	}
 	
 	//Copy Constructor
 	public Clerk(Clerk other) {
 		super(other);
-		this.clerkID = other.clerkID;
+		this.clkID = other.clkID;
 	}
 	
 	public String ToString() {
 		return super.ToString() + 
-				", \nClerk ID: " + clerkID + "\n";
+				", \nClerk ID: " + clkID + "\n";
 	}
 	
-	public String getId() {
-		return clerkID;
+	public String getClkId() {
+		return clkID;
 	}
-	
-	public void setId(String clerkID) {
-		this.clerkID = clerkID;
+
+	public void setClkId(String clkID) {
+		this.clkID = clkID;
 	}
 	
 

@@ -2,15 +2,21 @@ package databaseModule;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
+
+import userModule.User;
+import userModule.Manager;
+import userModule.Clerk;
+import userModule.Customer;
 
 
 /* Database Helper Class
  * This class will contain methods to assist with database operations
  * such as connecting to the database, and closing connections.
  */
-
 public class DBHelper {
 	private static final String DB_URL = "jdbc:mysql://localhost:3307/smartship_package_management_system";
 	private static final String USER = "root";

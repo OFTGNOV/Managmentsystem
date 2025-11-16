@@ -71,7 +71,37 @@ public class UserDAO {
         }
     }
 
-    // Retrieve user by ID
+    // Update user. If passwordHash on the provided user is non-null it will update password and salt as well.
+	public static void updateUserRecord(User user) {
+	    // Base update (without password)
+	    String sqlBase = "UPDATE `user` SET Fname = ?, Lname = ?, email = ?";
+	    boolean updatePassword = user.getPasswordHash() != null && user.getSalt() != null;
+	    String sql = updatePassword ? sqlBase + ", password = ?, salt = ? WHERE ID = ?" : sqlBase + " WHERE ID = ?";
+	
+	    try (Connection conn = DBHelper.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+	        ps.setString(1, user.getFirstName());
+	        ps.setString(2, user.getLastName());
+	        ps.setString(3, user.getEmail());
+	        int idx = 4;
+	        if (updatePassword) {
+	            ps.setString(idx++, user.getPasswordHash());
+	            ps.setString(idx++, user.getSalt());
+	        }
+	        ps.setInt(idx, user.getID());
+	        int affected = ps.executeUpdate();
+	        if (affected > 0) {
+	            JOptionPane.showMessageDialog(null, "User updated successfully.");
+	        } else {
+	            JOptionPane.showMessageDialog(null, "No user found with the provided ID. Update did not modify any rows.");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        JOptionPane.showMessageDialog(null, "Error updating user: " + e.getMessage());
+	    }
+	}
+
+	// Retrieve user by ID
     public static User retrieveUserRecordById(int userId) {
         String sql = "SELECT ID, Fname, Lname, email, password, salt FROM `user` WHERE ID = ?";
         try (Connection conn = DBHelper.getConnection();
@@ -84,7 +114,7 @@ public class UserDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error retrieving user by ID: " + e.getMessage());
         }
         return null;
     }
@@ -96,7 +126,10 @@ public class UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapResultSetToUser(rs);
+                if (rs.next()) {
+                	User u = mapResultSetToUser(rs);
+                	return u;
+                }
             }
         } catch (SQLException e) {
         	JOptionPane.showMessageDialog(null, "Error retrieving user by email: " + e.getMessage());
@@ -120,39 +153,9 @@ public class UserDAO {
         return users;
     }
 
-    // Update user. If passwordHash on the provided user is non-null it will update password and salt as well.
-    public static void updateUserRecord(User user) {
-        // Base update (without password)
-        String sqlBase = "UPDATE `user` SET Fname = ?, Lname = ?, email = ?";
-        boolean updatePassword = user.getPasswordHash() != null && user.getSalt() != null;
-        String sql = updatePassword ? sqlBase + ", password = ?, salt = ? WHERE ID = ?" : sqlBase + " WHERE ID = ?";
-
-        try (Connection conn = DBHelper.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, user.getFirstName());
-            ps.setString(2, user.getLastName());
-            ps.setString(3, user.getEmail());
-            int idx = 4;
-            if (updatePassword) {
-                ps.setString(idx++, user.getPasswordHash());
-                ps.setString(idx++, user.getSalt());
-            }
-            ps.setInt(idx, user.getID());
-            int affected = ps.executeUpdate();
-            if (affected > 0) {
-                JOptionPane.showMessageDialog(null, "User updated successfully.");
-            } else {
-                JOptionPane.showMessageDialog(null, "No user found with the provided ID. Update did not modify any rows.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error updating user: " + e.getMessage());
-        }
-    }
-
     // Helper Method to map a ResultSet row to a User object
-    private static User mapResultSetToUser(ResultSet rs) throws SQLException {
-        int id = rs.getInt("ID");
+    public static User mapResultSetToUser(ResultSet rs) throws SQLException {
+        int id = rs.getInt("ID"); //Get
         String fname = rs.getString("Fname");
         String lname = rs.getString("Lname");
         String email = rs.getString("email");

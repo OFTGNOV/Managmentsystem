@@ -13,30 +13,31 @@ public class Manager extends User {
 		this.mngID = "MNG-" + (int)Math.floor(Math.random() * 10000);
 	}
 	
+	// Overloaded method to generate ID based on userId and last name
 	public void generateMngID(String userId) {
 		if (userId == null) {
 			// if null provided, fall back to random id
 			generateMngID();
 			return;
 		}
-		this.mngID = "mng" + userId;
+		this.mngID = "mng" + userId + "-" + super.getLastName().toLowerCase();
 	}
 	
 	//Copy Constructor
 	public Manager(Manager other) {
 		super(other);
-		this.id = other.id;
+		this.mngID = other.mngID;
 	}
 	
 	public String ToString() {
 		return super.ToString() + 
-				", \nManager ID: " + id + "\n";
+				", \nManager ID: " + mngID + "\n";
 	}
 	
-	public String getId() {
-		return id;
+	public String getMngID() {
+		return mngID;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setMngID(String mngID) {
+		this.mngID = mngID;
 	}
 }
