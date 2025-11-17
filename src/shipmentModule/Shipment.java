@@ -22,7 +22,7 @@ public class Shipment {
     public Shipment(Customer sender, Customer recipent, double weight, 
     				double length, double width, double height, PackageType pType) {
     	this.trackingNumber = generateTrackingNumber();
-        this.sender = sender; 
+        this.sender = sender;
         this.recipent = recipent;
         this.weight = weight;
         this.length = length;
@@ -68,7 +68,7 @@ public class Shipment {
     //Randomly Generate a Tracking Number
     public String generateTrackingNumber() {
 		StringBuilder sb = new StringBuilder("TRK");
-		// Generate 10 random digits
+		// Generate 5 random digits
 		for (int i = 0; i < 5; i++) {
 			sb.append((int)(Math.random() * 10));
 		}
@@ -84,13 +84,12 @@ public class Shipment {
 		return sb.toString();
 	}
 
-    
-    // Returns a random distance based on the destination zone
+    // Returns a random distance based on the destination zone in km
     private double getZoneDistance() {
     	int zone = recipent.getZone();
 		switch (zone) {
 			case 1:
-				return Math.random() * 50.0; //
+				return Math.random() * 50.0; 
 			case 2:
 				return Math.random() * 100.0;
 			case 3:
@@ -114,8 +113,8 @@ public class Shipment {
     @Override
 	public String toString() {
 		return "Shipment - trackingNumber=" + trackingNumber + 
-				", \nSender: " + sender.getId()+ 
-				", \nRecipent: " + recipent.getId() +
+				", \nSender: " + sender.getCustId()+ 
+				", \nRecipent: " + recipent.getCustId() +
 				", \nweight: " + weight + 
 				"kg, \nlength: " + length + 
 				"cm, \nwidth: " + width + 

@@ -10,7 +10,7 @@ public class Customer extends User {
 	public Customer(String Fname,String Lname, String email, String password, String address, int zone) {
 		super(Fname, Lname, email, password);
 		// generate a fallback id by default (can be overwritten by generateCustID(usedId))
-		this.generateCustID();
+		this.generateRandomCustID();
 		this.address = address;
 		this.zone = zone;
 	}
@@ -23,20 +23,11 @@ public class Customer extends User {
 		this.zone = other.zone;
 	}
 	
-	private void generateCustID() {
+	private void generateRandomCustID() {
 		// fallback id generation similar to other user subclasses
 		this.custID = "CUST-" + (int)Math.floor(Math.random() * 10000);
 	}
 
-	// The requested method: prefix "cust" to a provided used ID to create the customer id
-	public void generateCustID(String userId) {
-		if (userId == null) {
-			// if null provided, fall back to random id
-			generateCustID();
-			return;
-		}
-		this.custID = "cust" + userId + "-" + super.getLastName().toLowerCase();
-	}
 	
 	@Override
 	public String ToString() {

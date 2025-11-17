@@ -6,21 +6,13 @@ public class Clerk extends User {
 	//Parameterized Constructor
 	public Clerk(String Fname,String Lname, String email, String password) {
 		super(Fname, Lname, email, password);
-		this.generateClerkID();
+		this.generateRandomClerkID();
 	}
 	
-	private void generateClerkID() {
+	private void generateRandomClerkID() {
 		this.clkID = "CLK-" + (int)Math.floor(Math.random() * 10000);
 	}
 	
-	public void generateClerkID(String userId) {
-		if (userId == null) {
-			// if null provided, fall back to random idS
-			generateClerkID();
-			return;
-		}
-		this.clkID = "clk" + userId + "-" + super.getLastName().toLowerCase();
-	}
 	
 	//Copy Constructor
 	public Clerk(Clerk other) {

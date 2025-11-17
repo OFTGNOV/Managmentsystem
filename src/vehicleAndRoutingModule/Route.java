@@ -1,59 +1,38 @@
-ackage vehicleAndRoutingModule;
+package vehicleAndRoutingModule;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import shipmentModule.Shipment;
+import userModule.Driver;
 
 /**
  * Route class represents a delivery route.
- * Contains multiple shipments and is assigned to a vehicle and driver.
+ * Tracks assigned vehicle, driver, shipments, and status.
+ * The routes themselves  are just tell where teh vechic
  */
 public class Route {
-    private String routeId;
-    private String vehicleId;
-    private String driverId;
-    private List<String> shipmentIds;
-    private LocalDateTime routeDate;
-    private RouteStatus status;
+    private int routeNum;
+    private List<Vehicle> vehicles;
+    private List<Shipment> shipments; //All shipments assigned to this route
+    private LocalDateTime startDate; //indicates when driver and vehicle started route
+    private LocalDateTime endDate; //indicates when driver and vehicle ended route
 
-    public enum RouteStatus {
-        ACTIVE, COMPLETED, CANCELLED
+
+    public Route( List<Vehicle> vehicles, List<Driver> drivers, List<Shipment> shipments) {
+        this.routeNum = routeNum;
+        this.vehicles = new ArrayList<>(vehicles);
+        this.shipments = new ArrayList<>(shipments);
+        this.startDate = LocalDateTime.now();
     }
 
-    public Route(String routeId, String vehicleId, String driverId) {
-        this.routeId = routeId;
-        this.vehicleId = vehicleId;
-        this.driverId = driverId;
-        this.shipmentIds = new ArrayList<>();
-        this.routeDate = LocalDateTime.now();
-        this.status = RouteStatus.ACTIVE;
-    }
-
-    public void addShipment(String shipmentId) {
-        if (!shipmentIds.contains(shipmentId)) {
-            shipmentIds.add(shipmentId);
+    public void addShipment(Shipment shipment) {
+        if (!shipments.contains(shipment)) {
+            shipments.add(shipment);
         }
     }
 
-    public void removeShipment(String shipmentId) {
-        shipmentIds.remove(shipmentId);
-    }
-
-    public void completeRoute() {
-        this.status = RouteStatus.COMPLETED;
-    }
-
-    // Getters
-    public String getRouteId() { return routeId; }
-    public String getVehicleId() { return vehicleId; }
-    public String getDriverId() { return driverId; }
-    public List<String> getShipmentIds() { return new ArrayList<>(shipmentIds); }
-    public LocalDateTime getRouteDate() { return routeDate; }
-    public RouteStatus getStatus() { return status; }
-
-    @Override
-    public String toString() {
-        return String.format("Route #%s - %d Shipments - [%s]",
-                routeId, shipmentIds.size(), status);
+    public void removeShipment(Shipment shipment) {
+        shipments.remove(shipment);
     }
 }

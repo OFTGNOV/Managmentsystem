@@ -8,7 +8,7 @@ import userModule.Driver;
 public class Vehicle {
 	private Driver assignedDriver; // Driver assigned to this vehicle
     private String licensePlate;
-    private String vehicleType; // van, truck, car, bike,
+    private String vehicleType; // van, truck, car, etc.
     private double maxWeightCapacity; // in kg
     private int maxPackageCapacity; // number of packages
     private double currentWeight;
@@ -74,14 +74,14 @@ public class Vehicle {
 
     @Override
     public String toString() {
-        return "Assigned Driver: " + assignedDriver.getId() +
+        return "Assigned Driver: " + assignedDriver.getdln() +
         		", \nLicense Plate: " + licensePlate + 
         		", \nVehicle Type: " + vehicleType + 
         		", \nMax Weight Capacity: " + maxWeightCapacity + 
         		"kg, \nMax Package Capacity: " + maxPackageCapacity + 
-				"kg, \nCurrent Vehcicle Weight: " + currentWeight + 
+				"kg, \nCurrent Vehicle Weight: " + currentWeight + 
 				"kg, \nCurrent Package Count: " + currentPackageCount + 
-				", \nIs This Vehcile Available: " + isAvailable;
+				", \nIs This Vehicle Available: " + isAvailable;
     }
     
     
@@ -141,7 +141,14 @@ public class Vehicle {
 	public void setAvailable(boolean isAvailable) {
 		this.isAvailable = isAvailable;
 	}
+
+    public Driver getAssignedDriver() {
+        return assignedDriver;
+    }
+
+    public void setAssignedDriver(Driver assignedDriver) {
+        this.assignedDriver = assignedDriver;
+    }
     
     
 }
-

@@ -33,7 +33,7 @@ public class ManagerDAO {
 		try (Connection conn = DBHelper.getConnection();
 				 PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setString(1, manager.getMngID());
-			ps.setInt(2, userId);
+			ps.setInt(2, userId);//
 			int affected = ps.executeUpdate();
 			if (affected > 0) {
 				JOptionPane.showMessageDialog(null, "Manager record inserted successfully.");

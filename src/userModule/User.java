@@ -67,6 +67,11 @@ public class User {
     public void setID(int ID) {
     	this.ID = ID;
     }
+
+    // Backwards-compatible lowercase accessor used in some modules
+    public int getId() {
+        return getID();
+    }
     
     public String getFirstName() {
         return Fname;

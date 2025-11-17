@@ -6,21 +6,12 @@ public class Manager extends User {
 	//Parameterized Constructor
 	public Manager(String Fname,String Lname, String email, String password) {
 		super(Fname, Lname, email, password);
-		this.generateMngID();
+		this.generateRandomID();
 	}
 	
-	private void generateMngID() {
+	private void generateRandomID() {
+		// Generate a random manager ID as a fallback
 		this.mngID = "MNG-" + (int)Math.floor(Math.random() * 10000);
-	}
-	
-	// Overloaded method to generate ID based on userId and last name
-	public void generateMngID(String userId) {
-		if (userId == null) {
-			// if null provided, fall back to random id
-			generateMngID();
-			return;
-		}
-		this.mngID = "mng" + userId + "-" + super.getLastName().toLowerCase();
 	}
 	
 	//Copy Constructor
