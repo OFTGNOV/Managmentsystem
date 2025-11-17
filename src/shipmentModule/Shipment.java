@@ -1,10 +1,12 @@
 package shipmentModule;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import userModule.Customer;
 
 public class Shipment {
-	private String trackingNumber;
+    private String trackingNumber;
     private Customer sender;
     private Customer recipent;            
     private double weight; //weight is in Kilograms
@@ -17,11 +19,14 @@ public class Shipment {
     private LocalDateTime createdDate;
     private LocalDateTime deliveredDate;
 
+    // Listeners
+    private List<ShipmentStatusListener> statusListeners = new ArrayList<>();
+
 
     // Paramtized Constructor
     public Shipment(Customer sender, Customer recipent, double weight, 
-    				double length, double width, double height, PackageType pType) {
-    	this.trackingNumber = generateTrackingNumber();
+                    double length, double width, double height, PackageType pType) {
+        this.trackingNumber = generateTrackingNumber();
         this.sender = sender;
         this.recipent = recipent;
         this.weight = weight;
@@ -36,16 +41,16 @@ public class Shipment {
     
     // Copy Constructor
     public Shipment(Shipment other) {
-    	this.trackingNumber = other.trackingNumber;
-		this.weight = other.weight;
-		this.length = other.length;
-		this.width = other.width;
-		this.height = other.height;
-		this.pType = other.pType;
-		this.status = other.status;
-		this.shippingCost = other.shippingCost;
-		this.createdDate = other.createdDate;
-		this.deliveredDate = other.deliveredDate;
+        this.trackingNumber = other.trackingNumber;
+        this.weight = other.weight;
+        this.length = other.length;
+        this.width = other.width;
+        this.height = other.height;
+        this.pType = other.pType;
+        this.status = other.status;
+        this.shippingCost = other.shippingCost;
+        this.createdDate = other.createdDate;
+        this.deliveredDate = other.deliveredDate;
     }
 
     /* Calculates shipping cost based on weight, destination zone, 
@@ -67,39 +72,37 @@ public class Shipment {
     
     //Randomly Generate a Tracking Number
     public String generateTrackingNumber() {
-		StringBuilder sb = new StringBuilder("TRK");
-		// Generate 5 random digits
-		for (int i = 0; i < 5; i++) {
-			sb.append((int)(Math.random() * 10));
-		}
-		
-		if (pType == PackageType.EXPRESS ) {
-			sb.append("EX");
-		} else if (pType == PackageType.FRAGILE) {
-			sb.append("FR");
-		} else {
-			sb.append("ST");
-		}
-			
-		return sb.toString();
-	}
+        StringBuilder sb = new StringBuilder("TRK");
+        //generate a random 4 digit number
+        sb.append((int)(Math.random() * 10000));
+        
+        if (pType == PackageType.EXPRESS ) {
+            sb.append("EX");
+        } else if (pType == PackageType.FRAGILE) {
+            sb.append("FR");
+        } else {
+            sb.append("ST");
+        }
+            
+        return sb.toString();
+    }
 
     // Returns a random distance based on the destination zone in km
     private double getZoneDistance() {
-    	int zone = recipent.getZone();
-		switch (zone) {
-			case 1:
-				return Math.random() * 50.0; 
-			case 2:
-				return Math.random() * 100.0;
-			case 3:
-				return Math.random() * 200.0;
-			case 4:
-				return Math.random() * 300.0;
-			default:
-				return 0.0;
-		}
-    	
+        int zone = recipent.getZone();
+        switch (zone) {
+            case 1:
+                return Math.random() * 50.0; 
+            case 2:
+                return Math.random() * 100.0;
+            case 3:
+                return Math.random() * 200.0;
+            case 4:
+                return Math.random() * 300.0;
+            default:
+                return 0.0;
+        }
+        
     }
 
     // Updates the shipment status and sets delivered date if applicable
@@ -108,118 +111,139 @@ public class Shipment {
         if (newStatus == ShipmentStatus.DELIVERED) {
             this.deliveredDate = LocalDateTime.now();
         }
+        // notify listeners about status change
+        for (ShipmentStatusListener l : new ArrayList<>(statusListeners)) {
+            try {
+                l.onStatusChanged(this, newStatus);
+            } catch (Exception ex) {
+                // swallow listener exceptions to avoid breaking update flow
+            }
+        }
     }
     
     @Override
-	public String toString() {
-		return "Shipment - trackingNumber=" + trackingNumber + 
-				", \nSender: " + sender.getCustId()+ 
-				", \nRecipent: " + recipent.getCustId() +
-				", \nweight: " + weight + 
-				"kg, \nlength: " + length + 
-				"cm, \nwidth: " + width + 
-				"cm, \nheight: " + height + 
-				"cm, \nPackage Type: " + pType + 
-				", \nStatus: " + status + 
-				String.format(", \nShipping Cost: $%.2f", shippingCost) +  
-				", \nCreated Date: " + createdDate + 
-				", \nDelivered Date: " + deliveredDate;
-	}
+    public String toString() {
+        return "Shipment - trackingNumber=" + trackingNumber + 
+                ", \nSender: " + sender.getCustId()+ 
+                ", \nRecipent: " + recipent.getCustId() +
+                ", \nweight: " + weight + 
+                "kg, \nlength: " + length + 
+                "cm, \nwidth: " + width + 
+                "cm, \nheight: " + height + 
+                "cm, \nPackage Type: " + pType + 
+                ", \nStatus: " + status + 
+                String.format(", \nShipping Cost: $%.2f", shippingCost) +  
+                ", \nCreated Date: " + createdDate + 
+                ", \nDelivered Date: " + deliveredDate;
+    }
     
+    // Listener management
+    public void addStatusListener(ShipmentStatusListener listener) {
+        if (listener == null) return;
+        if (!statusListeners.contains(listener)) {
+            statusListeners.add(listener);
+        }
+    }
+
+    public void removeStatusListener(ShipmentStatusListener listener) {
+        if (listener == null) return;
+        statusListeners.remove(listener);
+    }
+
     //Getters and Setters
-	public String getTrackingNumber() {
-		return trackingNumber;
-	}
+    public String getTrackingNumber() {
+        return trackingNumber;
+    }
 
-	public void setTrackingNumber(String trackingNumber) {
-		this.trackingNumber = trackingNumber;
-	}
-	
-	public Customer getSender() {
-		return sender;
-	}
-	
-	public void setSender(Customer sender) {
-		this.sender = sender;
-	}
-	
-	public Customer getRecipent() {
-		return recipent;
-	}
-	
-	public void setRecipent(Customer recipent) {
-		this.recipent = recipent;
-	}
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
+    }
+    
+    public Customer getSender() {
+        return sender;
+    }
+    
+    public void setSender(Customer sender) {
+        this.sender = sender;
+    }
+    
+    public Customer getRecipent() {
+        return recipent;
+    }
+    
+    public void setRecipent(Customer recipent) {
+        this.recipent = recipent;
+    }
 
-	public double getWeight() {
-		return weight;
-	}
+    public double getWeight() {
+        return weight;
+    }
 
-	public void setWeight(double weight) {
-		this.weight = weight;
-	}
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
 
-	public double getLength() {
-		return length;
-	}
+    public double getLength() {
+        return length;
+    }
 
-	public void setLength(double length) {
-		this.length = length;
-	}
+    public void setLength(double length) {
+        this.length = length;
+    }
 
-	public double getWidth() {
-		return width;
-	}
+    public double getWidth() {
+        return width;
+    }
 
-	public void setWidth(double width) {
-		this.width = width;
-	}
+    public void setWidth(double width) {
+        this.width = width;
+    }
 
-	public double getHeight() {
-		return height;
-	}
+    public double getHeight() {
+        return height;
+    }
 
-	public void setHeight(double height) {
-		this.height = height;
-	}
+    public void setHeight(double height) {
+        this.height = height;
+    }
 
-	public PackageType getpType() {
-		return pType;
-	}
+    public PackageType getpType() {
+        return pType;
+    }
 
-	public void setpType(PackageType pType) {
-		this.pType = pType;
-	}
+    public void setpType(PackageType pType) {
+        this.pType = pType;
+    }
 
-	public ShipmentStatus getStatus() {
-		return status;
-	}
+    public ShipmentStatus getStatus() {
+        return status;
+    }
 
-	public void setStatus(ShipmentStatus status) {
-		this.status = status;
-	}
+    public void setStatus(ShipmentStatus status) {
+        this.status = status;
+    }
 
-	public double getShippingCost() {
-		return shippingCost;
-	}
-	
-	public void setShippingCost(double shippingCost) {
-		this.shippingCost = shippingCost;
-	}
+    public double getShippingCost() {
+        return shippingCost;
+    }
+    
+    public void setShippingCost(double shippingCost) {
+        this.shippingCost = shippingCost;
+    }
 
-	public LocalDateTime getCreatedDate() {
-		return createdDate;
-	}
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
 
-	public void setCreatedDate(LocalDateTime createdDate) {
-		this.createdDate = createdDate;
-	}
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
 
-	public LocalDateTime getDeliveredDate() {
-		return deliveredDate;
-	}
+    public LocalDateTime getDeliveredDate() {
+        return deliveredDate;
+    }
 
-	public void setDeliveredDate(LocalDateTime deliveredDate) {
-		this.deliveredDate = deliveredDate;
-	}
+    public void setDeliveredDate(LocalDateTime deliveredDate) {
+        this.deliveredDate = deliveredDate;
+    }
 }

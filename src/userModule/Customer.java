@@ -9,7 +9,7 @@ public class Customer extends User {
 	//Parameterized Constructor
 	public Customer(String Fname,String Lname, String email, String password, String address, int zone) {
 		super(Fname, Lname, email, password);
-		// generate a fallback id by default (can be overwritten by generateCustID(usedId))
+		// generate a id by default
 		this.generateRandomCustID();
 		this.address = address;
 		this.zone = zone;
