@@ -150,4 +150,24 @@ public class DriverDAO {
 		d.setPasswordHashAndSalt(passwordHash, salt);
 		return d;
 	}
+
+	// Retrieve Driver by ID
+	public static Driver retrieveDriverById(int driverId) {
+		String sql = "SELECT u.ID, u.Fname, u.Lname, u.email, u.password, u.salt, d.dln " +
+				 "FROM driver d JOIN `user` u ON d.UserID = u.ID WHERE u.ID = ?";
+		try (Connection conn = DBHelper.getConnection();
+			     PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, driverId);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					Driver d = mapResultSetToDriver(rs);
+					return d;
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Error retrieving driver by ID: " + e.getMessage());
+		}
+		return null;
+	}
 }

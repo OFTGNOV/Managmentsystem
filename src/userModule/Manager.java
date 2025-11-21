@@ -25,6 +25,7 @@ public class Manager extends User {
 				", \nManager ID: " + mngID + "\n";
 	}
 	
+	//getters and setters
 	public String getMngID() {
 		return mngID;
 	}

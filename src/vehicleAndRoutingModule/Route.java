@@ -189,8 +189,22 @@ public class Route {
             }
         }
     }
+    
+    
 
-    public int getZone() {
+    public void setZone(int zone) {
+		this.zone = zone;
+	}
+
+	public void setStartTime(LocalDateTime startTime) {
+		this.startTime = startTime;
+	}
+
+	public void setEndTime(LocalDateTime endTime) {
+		this.endTime = endTime;
+	}
+
+	public int getZone() {
     	return zone;
     }
     

@@ -24,7 +24,6 @@ public class Customer extends User {
 	}
 	
 	private void generateRandomCustID() {
-		// fallback id generation similar to other user subclasses
 		this.custID = "CUST-" + (int)Math.floor(Math.random() * 10000);
 	}
 

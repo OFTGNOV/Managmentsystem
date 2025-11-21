@@ -54,7 +54,7 @@ public class Vehicle implements ShipmentStatusListener {
         for (Shipment s : this.assignedShipments) {
             s.addStatusListener(this);
         }
-        }
+       }
 
     // Checks if a package can be added without exceeding capacity
     public boolean canAddPackage(double packageWeight) {
@@ -131,20 +131,25 @@ public class Vehicle implements ShipmentStatusListener {
 	    }
 	}
 
-	@Override
-    public String toString() {
-        return "Assigned Driver: " + assignedDriver.getdln() +
-                ", \nLicense Plate: " + licensePlate + 
-                ", \nVehicle Type: " + vehicleType + 
-                ", \nMax Weight Capacity: " + maxWeightCapacity + 
-                "kg, \nMax Package Capacity: " + maxPackageCapacity + 
-                "kg, \nCurrent Vehicle Weight: " + currentWeight + 
-                "kg, \nCurrent Package Count: " + currentPackageCount + 
-                ", \nIs This Vehicle Available: " + isAvailable;
-    }
+    // Route reservation API
+	public synchronized boolean assignToRoute(Route r) {
+	    if (r == null) return false;
+	    if (this.currentRoute != null) return false; // vehicle already on a route
+	    this.currentRoute = r;
+	    this.isAvailable = false;
+	    return true;
+	}
 
-    
-    //
+	public synchronized void releaseFromRoute(Route r) {
+	    // only release if the same route or if null passed
+	    if (this.currentRoute == null) return;
+	    if (r == null || this.currentRoute == r) {
+	        this.currentRoute = null;
+	        this.isAvailable = true;
+	    }
+	}
+
+	// Getters and Setters
     public Driver getAssignedDriver() {
         return assignedDriver;
     }
@@ -209,24 +214,6 @@ public class Vehicle implements ShipmentStatusListener {
     public void setAvailable(boolean isAvailable) {
         // preserve manual flag but a running route will still mark the vehicle busy
         this.isAvailable = isAvailable;
-    }
-
-    // Route reservation API
-    public synchronized boolean assignToRoute(Route r) {
-        if (r == null) return false;
-        if (this.currentRoute != null) return false; // vehicle already on a route
-        this.currentRoute = r;
-        this.isAvailable = false;
-        return true;
-    }
-
-    public synchronized void releaseFromRoute(Route r) {
-        // only release if the same route or if null passed
-        if (this.currentRoute == null) return;
-        if (r == null || this.currentRoute == r) {
-            this.currentRoute = null;
-            this.isAvailable = true;
-        }
     }
 
     public Route getCurrentRoute() {
