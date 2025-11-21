@@ -12,7 +12,7 @@ public class User {
     
     ///Paramatized Contsturctor
     public User(String Fname, String Lname, String email, String password) {
-    	this.ID = ID;
+    	this.ID = 0; // default ID, database layer should set this appropriately
         this.Fname = Fname;
         this.Lname = Lname;
         this.email = email;

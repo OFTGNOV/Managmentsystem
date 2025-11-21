@@ -145,6 +145,7 @@ public class ClerkDAO {
 		String passwordHash = rs.getString("password");
 		String salt = rs.getString("salt");
 		String clkID  = rs.getString("clkID");
+		
 		Clerk c = new Clerk(fname, lname, email, null);
 		c.setID(uid);
 		c.setPasswordHashAndSalt(passwordHash, salt);

@@ -29,15 +29,15 @@ public class Invoice {
         this.dueDate = this.issueDate.plusDays(30); // Default 30 days due date
         this.status = InvoiceStatus.PENDING;
         this.payments = new ArrayList<>();
-        this.invoiceNumber = generateInvoiceNumber();
+        this.invoiceNum = generateInvoiceNumber();
         this.notes = "Invoice for shipment: " + shipment.getTrackingNumber();
     }
 
     // Parameterized constructor with all fields
-    public Invoice(String invoiceNum, Shipment shipment, Customer sender, Customer recipient, 
+    public Invoice(Shipment shipment, Customer sender, Customer recipient,
                    double totalAmount, LocalDateTime issueDate, LocalDateTime dueDate, 
                    InvoiceStatus status, List<Payment> payments, String notes) {
-        this.invoiceNum = invoiceNum;
+        this.invoiceNum = generateInvoiceNumber();
         this.shipment = shipment;
         this.sender = sender;
         this.recipient = recipient;
@@ -117,23 +117,6 @@ public class Invoice {
         }
     }
 
-    // Process a payment for this invoice
-    public boolean processPayment(double amount,PaymentMethod paymentMethod) {
-        if (amount <= 0 || amount > getRemainingBalance()) {
-            return false; // Invalid payment amount
-        }
-
-        Payment payment = new Payment(amount, paymentMethod);
-        addPayment(payment);
-        return true;
-    }
-
-    // Process cash payment (to be paid in store)
-    public boolean processCashPayment() {
-        Payment payment = new Payment(this.invoiceNum, PaymentMethod.CASH);
-        addPayment(payment);
-        return true;
-    }
 
     // Getters and Setters
     public String getInvoiceNum() {
@@ -223,30 +206,28 @@ public class Invoice {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Invoice invoice = (Invoice) o;
-        return id == invoice.id && 
-               Double.compare(invoice.totalAmount, totalAmount) == 0 && 
-               Objects.equals(invoiceNumber, invoice.invoiceNumber) && 
-               Objects.equals(shipment, invoice.shipment) && 
-               Objects.equals(sender, invoice.sender) && 
-               Objects.equals(recipient, invoice.recipient) && 
-               Objects.equals(issueDate, invoice.issueDate) && 
-               Objects.equals(dueDate, invoice.dueDate) && 
-               status == invoice.status && 
-               Objects.equals(payments, invoice.payments) && 
+        return Double.compare(invoice.totalAmount, totalAmount) == 0 &&
+               Objects.equals(invoiceNum, invoice.invoiceNum) &&
+               Objects.equals(shipment, invoice.shipment) &&
+               Objects.equals(sender, invoice.sender) &&
+               Objects.equals(recipient, invoice.recipient) &&
+               Objects.equals(issueDate, invoice.issueDate) &&
+               Objects.equals(dueDate, invoice.dueDate) &&
+               status == invoice.status &&
+               Objects.equals(payments, invoice.payments) &&
                Objects.equals(notes, invoice.notes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, invoiceNumber, shipment, sender, recipient, totalAmount, 
+        return Objects.hash(invoiceNum, shipment, sender, recipient, totalAmount,
                            issueDate, dueDate, status, payments, notes);
     }
 
     @Override
     public String toString() {
         return "Invoice{" +
-                "id=" + id +
-                ", invoiceNumber='" + invoiceNumber + '\'' +
+                "invoiceNum='" + invoiceNum + '\'' +
                 ", shipment=" + (shipment != null ? shipment.getTrackingNumber() : "null") +
                 ", sender=" + (sender != null ? sender.getCustId() : "null") +
                 ", recipient=" + (recipient != null ? recipient.getCustId() : "null") +
