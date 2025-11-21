@@ -245,7 +245,6 @@ public class VehicleDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, licensePlate);
             try (ResultSet rs = ps.executeQuery()) {
-                ShipmentDAO shipmentDAO = new ShipmentDAO();
                 while (rs.next()) {
                     String trackingNumber = rs.getString("shipmentTrackingNumber");
                     shipmentModule.Shipment shipment = ShipmentDAO.retrieveShipmentByTrackingNumber(trackingNumber);

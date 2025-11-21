@@ -44,7 +44,7 @@ public class Route {
     // Simple route number generator (could be improved to ensure uniqueness)
     private String generateRouteNumber() {
     	//Generates a random route number from 0 to 10000
-    	return "ROUTE-" + (int)(Math.random() * 10000);
+    	return "ROUTE-" + System.currentTimeMillis() + "-" + (int)(Math.random() * 10000);
     }
 
     // Copy constructor

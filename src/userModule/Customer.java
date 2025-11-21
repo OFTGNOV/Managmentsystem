@@ -24,7 +24,7 @@ public class Customer extends User {
 	}
 	
 	private void generateRandomCustID() {
-		this.custID = "CUST-" + (int)Math.floor(Math.random() * 10000);
+		this.custID = "CUST-" + System.currentTimeMillis() + "-" + (int)Math.floor(Math.random() * 10000);
 	}
 
 	

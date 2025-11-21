@@ -1,5 +1,5 @@
 package billingAndPaymentModule;
 
 public enum PaymentStatus {
-	UNPAID, PARTIALLY_PAID, PAID
+    SUCCESS, FAILED, PENDING, CANCELLED, REFUNDED
 }

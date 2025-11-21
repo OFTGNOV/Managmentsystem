@@ -174,9 +174,11 @@ public class RouteDAO {
         }
 
         Route route = new Route(vehicle);
+        route.setVehicle(vehicle);
         route.setRouteNum(routeNum);
         route.setStartTime(startTime);
         route.setEndTime(endTime);
+        route.setZone(zone);
 
         return route;
     }
@@ -233,7 +235,6 @@ public class RouteDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, routeNum);
             try (ResultSet rs = ps.executeQuery()) {
-                ShipmentDAO shipmentDAO = new ShipmentDAO();
                 while (rs.next()) {
                     String trackingNumber = rs.getString("shipmentTrackingNumber");
                     shipmentModule.Shipment shipment = ShipmentDAO.retrieveShipmentByTrackingNumber(trackingNumber);

@@ -10,7 +10,7 @@ public class Clerk extends User {
 	}
 	
 	private void generateRandomClerkID() {
-		this.clkID = "CLK-" + (int)Math.floor(Math.random() * 10000);
+		this.clkID = "CLK-" + System.currentTimeMillis() + "-" + (int)Math.floor(Math.random() * 10000);
 	}
 	
 	

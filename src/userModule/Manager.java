@@ -11,7 +11,7 @@ public class Manager extends User {
 	
 	private void generateRandomID() {
 		// Generate a random manager ID as a fallback
-		this.mngID = "MNG-" + (int)Math.floor(Math.random() * 10000);
+		this.mngID = "MNG-" + System.currentTimeMillis() + "-" + (int)Math.floor(Math.random() * 10000);
 	}
 	
 	//Copy Constructor
