@@ -1,4 +1,3 @@
-```markdown
 # **SmartShip Package Management System**
 
 A full-stack Java application designed to manage shipments, fleets, billing, and user operations for a courier company.
@@ -182,4 +181,3 @@ Troubleshooting tips:
 * If Eclipse doesn't detect an existing project, try: File > Import > Git > Projects from Git > Existing local repository, then Import as Existing Java Project.
 * If classpath/module issues appear, check Project > Clean... and then rebuild.
 * If you receive missing class errors, confirm all jars in lib are on the project's build path.
-```
