@@ -1,3 +1,4 @@
+```markdown
 # **SmartShip Package Management System**
 
 A full-stack Java application designed to manage shipments, fleets, billing, and user operations for a courier company.
@@ -132,3 +133,53 @@ Design deliverables included:
 * **Socket Programming** (Client/Server)
 * **SQL Database**
 * **PDF Generation Libraries**
+
+---
+
+## Eclipse: Cloning & Importing into your Eclipse workspace
+
+If you're a classmate and want to clone this repository and work on it in Eclipse, follow these steps.
+
+Prerequisites:
+* Install JDK (Java 8+ recommended).
+* Install Git integration (Eclipse has EGit by default in most packages).
+* (Optional) Create a local MySQL database and update DB connectivity in databaseModule/DBHelper.java before running.
+
+1. Clone the repository
+   - Open Eclipse.
+   - File > Import...
+   - Select Git > Projects from Git > Next.
+   - Select Clone URI > Next.
+   - For Repository URI enter: https://github.com/OFTGNOV/Managmentsystem.git
+   - Enter credentials if required (you can clone anonymously for public repos).
+   - Select the branch (usually main) and click Next.
+   - Choose a local directory for the clone and click Finish.
+
+2. Import the project into the workspace
+   - After cloning, File > Import...
+   - Select General > Existing Projects into Workspace > Next.
+   - Click Browse and select the cloned repository folder.
+   - The project should appear in the Projects list. Ensure it is checked and click Finish.
+
+3. Configure project settings
+   - Ensure the Java Build Path points to a valid JRE/JDK:
+     - Right-click project > Properties > Java Build Path > Libraries.
+     - Add/confirm the JRE System Library matches your installed JDK.
+   - If your Eclipse workspace uses modules (module-info.java):
+     - Ensure the project's Java compliance level matches the module settings (Project > Properties > Java Compiler).
+
+4. Add external libraries
+   - If the project depends on external jars in /lib, add them to the build path:
+     - Right-click project > Properties > Java Build Path > Libraries > Add JARs... (select from project) or Add External JARs...
+   - Alternatively, use a build tool (Maven/Gradle) if available; this repo uses manual lib/ inclusion.
+
+5. Run the application
+   - Locate the main class or GUI entry point (for example Testdriver in /src/testing or specific MainWindow classes).
+   - Right-click the class > Run As > Java Application.
+   - If the program needs DB access, ensure DBHelper settings (host, user, password) point to your local DB and that required tables are present.
+
+Troubleshooting tips:
+* If Eclipse doesn't detect an existing project, try: File > Import > Git > Projects from Git > Existing local repository, then Import as Existing Java Project.
+* If classpath/module issues appear, check Project > Clean... and then rebuild.
+* If you receive missing class errors, confirm all jars in lib are on the project's build path.
+```
