@@ -6,7 +6,6 @@ import billingAndPaymentModule.Payment;
 import databaseModule.DBHelper;
 import databaseModule.sDAO.ShipmentDAO;
 import shipmentModule.Shipment;
-import userModule.Customer;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,40 +15,36 @@ import javax.swing.JOptionPane;
 public class InvoiceDAO {
 
     // Insert Invoice Record with parameters
-    public static void insertInvoiceRecord(Shipment shipment, Customer sender, Customer recipient,
-            double totalAmount, LocalDateTime issueDate, LocalDateTime dueDate, 
-            InvoiceStatus status, List<Payment> payments, String notes) {
+    public static void insertInvoiceRecord(Shipment shipment, String senderId, String recipentId,
+            double totalAmount, LocalDateTime issueDate, LocalDateTime dueDate,
+            InvoiceStatus status, String notes) {
     	// Create Invoice object
-       Invoice invoice = new Invoice(shipment, sender, recipient,totalAmount, issueDate, dueDate, 
-    		   status, payments, notes);
+       String invoiceNum = generateInvoiceNumber();
+       Invoice invoice = new Invoice(invoiceNum, shipment, senderId, recipentId, totalAmount, issueDate, dueDate,
+    		   status, notes);
        insertInvoiceRecord(invoice); // Call the method to insert Invoice object
     }
 
     // Insert a new invoice record
     public static void insertInvoiceRecord(Invoice invoice) {
-        String sql = "INSERT INTO invoice (invoiceNumber, shipment_trackingNumber, totalAmount, issueDate, dueDate, status, notes) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO invoice (invoiceNum, shipment_trackingNumber, senderId, recipentId, totalAmount, issueDate, dueDate, status, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBHelper.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, invoice.getInvoiceNum());
             ps.setString(2, invoice.getShipment().getTrackingNumber());
-            ps.setDouble(3, invoice.getTotalAmount());
-            ps.setTimestamp(4, invoice.getIssueDate() == null ? null : Timestamp.valueOf(invoice.getIssueDate()));
-            ps.setTimestamp(5, invoice.getDueDate() == null ? null : Timestamp.valueOf(invoice.getDueDate()));
-            ps.setString(6, invoice.getStatus().name());
-            ps.setString(7, invoice.getNotes());
+            ps.setString(3, invoice.getSenderId());
+            ps.setString(4, invoice.getRecipentId());
+            ps.setDouble(5, invoice.getTotalAmount());
+            ps.setTimestamp(6, invoice.getIssueDate() == null ? null : Timestamp.valueOf(invoice.getIssueDate()));
+            ps.setTimestamp(7, invoice.getDueDate() == null ? null : Timestamp.valueOf(invoice.getDueDate()));
+            ps.setString(8, invoice.getStatus().name());
+            ps.setString(9, invoice.getNotes());
 
             int affected = ps.executeUpdate();
             if (affected == 0) {
                 JOptionPane.showMessageDialog(null, "Inserting invoice failed, no rows affected.");
                 return;
-            }
-
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) {
-                    // Since Invoice doesn't have an id field anymore, we can't set it
-                    // The invoice number is used as the identifier now
-                }
             }
 
             JOptionPane.showMessageDialog(null, "Invoice created successfully with number: " + invoice.getInvoiceNum());
@@ -61,19 +56,20 @@ public class InvoiceDAO {
 
     // Update an existing invoice record
     public static void updateInvoiceRecord(Invoice invoice) {
-        String sql = "UPDATE invoice SET invoiceNumber = ?, shipment_trackingNumber = ?, totalAmount = ?, issueDate = ?, dueDate = ?, status = ?, notes = ? WHERE invoiceNumber = ?";
+        String sql = "UPDATE invoice SET shipment_trackingNumber = ?, senderId = ?, recipentId = ?, totalAmount = ?, issueDate = ?, dueDate = ?, status = ?, notes = ? WHERE invoiceNum = ?";
 
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, invoice.getInvoiceNum());
-            ps.setString(2, invoice.getShipment().getTrackingNumber());
-            ps.setDouble(3, invoice.getTotalAmount());
-            ps.setTimestamp(4, Timestamp.valueOf(invoice.getIssueDate()));
-            ps.setTimestamp(5, Timestamp.valueOf(invoice.getDueDate()));
-            ps.setString(6, invoice.getStatus().name());
-            ps.setString(7, invoice.getNotes());
-            ps.setString(8, invoice.getInvoiceNum());
+            ps.setString(1, invoice.getShipment().getTrackingNumber());
+            ps.setString(2, invoice.getSenderId());
+            ps.setString(3, invoice.getRecipentId());
+            ps.setDouble(4, invoice.getTotalAmount());
+            ps.setTimestamp(5, Timestamp.valueOf(invoice.getIssueDate()));
+            ps.setTimestamp(6, Timestamp.valueOf(invoice.getDueDate()));
+            ps.setString(7, invoice.getStatus().name());
+            ps.setString(8, invoice.getNotes());
+            ps.setString(9, invoice.getInvoiceNum());
 
             int affected = ps.executeUpdate();
             if (affected > 0) {
@@ -89,7 +85,7 @@ public class InvoiceDAO {
 
     // Delete an invoice record
     public static void deleteInvoiceRecord(String invoiceNum) {
-        String sql = "DELETE FROM invoice WHERE invoiceNumber = ?";
+        String sql = "DELETE FROM invoice WHERE invoiceNum = ?";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, invoiceNum);
@@ -107,7 +103,7 @@ public class InvoiceDAO {
 
     // Retrieve an invoice by invoice number
     public static Invoice retrieveInvoiceByNumber(String invoiceNum) {
-        String sql = "SELECT id, invoiceNumber, shipment_trackingNumber, totalAmount, issueDate, dueDate, status, notes FROM invoice WHERE invoiceNumber = ?";
+        String sql = "SELECT invoiceNum, shipment_trackingNumber, senderId, recipentId, totalAmount, issueDate, dueDate, status, notes FROM invoice WHERE invoiceNum = ?";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, invoiceNum);
@@ -125,7 +121,7 @@ public class InvoiceDAO {
 
     // Get all invoices
     public static List<Invoice> readAllInvoices() {
-        String sql = "SELECT id, invoiceNumber, shipment_trackingNumber, totalAmount, issueDate, dueDate, status, notes FROM invoice";
+        String sql = "SELECT invoiceNum, shipment_trackingNumber, senderId, recipentId, totalAmount, issueDate, dueDate, status, notes FROM invoice";
         List<Invoice> invoices = new ArrayList<>();
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -138,14 +134,14 @@ public class InvoiceDAO {
         }
         return invoices;
     }
-    
- // Retrieve all payments for a specific invoice
-   public static List<Payment> retrievePaymentsByInvoiceNumber(String invoiceNumber) {
-        String sql = "SELECT id, amount, paymentDate, paymentMethod, status, referenceNumber FROM payment WHERE invoiceNumber = ?";
+
+    // Retrieve all payments for a specific invoice
+   public static List<Payment> retrievePaymentsByInvoiceNumber(String invoiceNum) {
+        String sql = "SELECT paymentId, amount, paymentDate, paymentMethod, status, referenceNumber, invoiceNum FROM payment WHERE invoiceNum = ?";
         List<Payment> payments = new ArrayList<>();
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, invoiceNumber);
+            ps.setString(1, invoiceNum);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     payments.add(PaymentDAO.mapResultSetToPayment(rs));
@@ -160,7 +156,7 @@ public class InvoiceDAO {
 
     // Get all invoices for a specific shipment
     public static List<Invoice> retrieveInvoicesByShipment(String trackingNumber) {
-        String sql = "SELECT id, invoiceNumber, shipment_trackingNumber, totalAmount, issueDate, dueDate, status, notes FROM invoice WHERE shipment_trackingNumber = ?";
+        String sql = "SELECT invoiceNum, shipment_trackingNumber, senderId, recipentId, totalAmount, issueDate, dueDate, status, notes FROM invoice WHERE shipment_trackingNumber = ?";
         List<Invoice> invoices = new ArrayList<>();
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -179,8 +175,10 @@ public class InvoiceDAO {
 
     // Helper method to map ResultSet to Invoice object
     private static Invoice mapResultSetToInvoice(ResultSet rs) throws SQLException {
-        String invoiceNum = rs.getString("invoiceNumber");
+        String invoiceNum = rs.getString("invoiceNum");
         String shipmentTrackingNumber = rs.getString("shipment_trackingNumber");
+        String senderId = rs.getString("senderId");
+        String recipentId = rs.getString("recipentId");
         double totalAmount = rs.getDouble("totalAmount");
         Timestamp issueDateTs = rs.getTimestamp("issueDate");
         Timestamp dueDateTs = rs.getTimestamp("dueDate");
@@ -192,8 +190,6 @@ public class InvoiceDAO {
 
         // Get shipment details using ShipmentDAO
         Shipment shipment = ShipmentDAO.retrieveShipmentByTrackingNumber(shipmentTrackingNumber);
-        Customer sender = shipment != null ? shipment.getSender() : null;
-        Customer recipient = shipment != null ? shipment.getRecipent() : null;
 
         InvoiceStatus status = InvoiceStatus.PENDING; // default
         try {
@@ -204,12 +200,17 @@ public class InvoiceDAO {
             // Keep default value
         }
 
-        // Get associated payments using local helper by invoiceNumber
+        // Get associated payments using local helper by invoiceNum
         List<Payment> payments = retrievePaymentsByInvoiceNumber(invoiceNum);
 
-        Invoice invoice = new Invoice(shipment, sender, recipient,
-                    totalAmount, issueDate, dueDate, status, payments, notes);
+        Invoice invoice = new Invoice(invoiceNum, shipment, senderId, recipentId,
+                    totalAmount, issueDate, dueDate, status, notes);
+        invoice.setPayments(payments); // Set payments list
         return invoice;
     }
 
+    // Helper method to generate an invoice number
+    private static String generateInvoiceNumber() {
+        return "INV-" + System.currentTimeMillis() + "-" + (int)(Math.random() * 10000);
+    }
 }

@@ -10,11 +10,23 @@ public class Payment {
     private PaymentMethod paymentMethod;
     private PaymentStatus status;
     private String referenceNumber; // For card transactions or other reference
+    private String invoiceNum; // Added to match database schema
 
     // Full constructor used by DAOs and mappers
     public Payment(int paymentId, double amount, LocalDateTime paymentDate,
-                   PaymentMethod paymentMethod, PaymentStatus status, String referenceNumber) {
+                   PaymentMethod paymentMethod, PaymentStatus status, String referenceNumber, String invoiceNum) {
         this.paymentId = paymentId;
+        this.amount = amount;
+        this.paymentDate = paymentDate;
+        this.paymentMethod = paymentMethod;
+        this.status = status;
+        this.referenceNumber = referenceNumber;
+        this.invoiceNum = invoiceNum;
+    }
+
+    // Constructor without invoiceNum (for new payments)
+    public Payment(double amount, LocalDateTime paymentDate, PaymentMethod paymentMethod,
+                   PaymentStatus status, String referenceNumber) {
         this.amount = amount;
         this.paymentDate = paymentDate;
         this.paymentMethod = paymentMethod;
@@ -30,6 +42,7 @@ public class Payment {
         this.paymentMethod = other.paymentMethod;
         this.status = other.status;
         this.referenceNumber = other.referenceNumber;
+        this.invoiceNum = other.invoiceNum;
     }
 
     // Generate reference number for the payment
@@ -66,12 +79,14 @@ public class Payment {
         this.paymentMethod = paymentMethod;
         this.status = PaymentStatus.SUCCESS;
         this.paymentDate = LocalDateTime.now();
+        this.referenceNumber = generateReferenceNumber();
         return true;
     }
 
     // Process cash payment (to be paid in store)
     public boolean processCashPayment() {
         selectPaymentMethod(PaymentMethod.CASH);
+        this.referenceNumber = generateReferenceNumber();
         return true;
     }
 
@@ -80,6 +95,7 @@ public class Payment {
         if (paymentMethod == PaymentMethod.CASH && status == PaymentStatus.PENDING && amount > 0) {
             this.amount = amount;
             this.status = PaymentStatus.SUCCESS;
+            this.paymentDate = LocalDateTime.now();
             return true;
         }
         return false;
@@ -134,6 +150,14 @@ public class Payment {
         this.referenceNumber = referenceNumber;
     }
 
+    public String getInvoiceNum() {
+        return invoiceNum;
+    }
+
+    public void setInvoiceNum(String invoiceNum) {
+        this.invoiceNum = invoiceNum;
+    }
+
     // Override equals method to compare Payment objects.
     @Override
     public boolean equals(Object o) {
@@ -145,7 +169,13 @@ public class Payment {
                Objects.equals(paymentDate, payment.paymentDate) &&
                paymentMethod == payment.paymentMethod &&
                status == payment.status &&
-               Objects.equals(referenceNumber, payment.referenceNumber);
+               Objects.equals(referenceNumber, payment.referenceNumber) &&
+               Objects.equals(invoiceNum, payment.invoiceNum);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(paymentId, amount, paymentDate, paymentMethod, status, referenceNumber, invoiceNum);
     }
 
     @Override
@@ -157,6 +187,7 @@ public class Payment {
                 ", paymentMethod=" + paymentMethod +
                 ", status=" + status +
                 ", referenceNumber='" + referenceNumber + '\'' +
+                ", invoiceNum='" + invoiceNum + '\'' +
                 '}';
     }
 }

@@ -192,9 +192,7 @@ public class Pdfreportexporter {
             }
         }
     }
-    
-    }
-    
+
     public static void exportDeliveryPerformanceReport(String filePath, LocalDate startDate, LocalDate endDate) {
         PDDocument document = new PDDocument();
         try {
@@ -298,8 +296,6 @@ public class Pdfreportexporter {
         }
     }
     
-    }
-    
     public static void exportVehicleUtilizationReport(String filePath, LocalDate startDate, LocalDate endDate) {
         PDDocument document = new PDDocument();
         try {
@@ -373,7 +369,6 @@ public class Pdfreportexporter {
         }
     }
     
-    }
     
     // Helper method to export a single invoice as PDF
     public static void exportInvoiceAsPDF(Invoice invoice, String filePath) {
@@ -428,26 +423,35 @@ public class Pdfreportexporter {
             contentStream.showText("From:");
             contentStream.endText();
             
-            if (invoice.getSender() != null) {
-                Customer sender = invoice.getSender();
-                yPosition -= 20;
-                contentStream.beginText();
-                contentStream.setFont(normalFont, 12);
-                contentStream.newLineAtOffset(70, yPosition);
-                contentStream.showText(sender.getFirstName() + " " + sender.getLastName());
-                contentStream.endText();
-                
-                yPosition -= 15;
-                contentStream.beginText();
-                contentStream.newLineAtOffset(70, yPosition);
-                contentStream.showText(sender.getAddress());
-                contentStream.endText();
-                
-                yPosition -= 15;
-                contentStream.beginText();
-                contentStream.newLineAtOffset(70, yPosition);
-                contentStream.showText("Zone: " + sender.getZone());
-                contentStream.endText();
+            if (invoice.getSenderId() != null) {
+                userModule.Customer sender = databaseModule.uDAO.CustomerDAO.retrieveCustomerById(invoice.getSenderId());
+                if (sender != null) {
+                    yPosition -= 20;
+                    contentStream.beginText();
+                    contentStream.setFont(normalFont, 12);
+                    contentStream.newLineAtOffset(70, yPosition);
+                    contentStream.showText(sender.getFirstName() + " " + sender.getLastName());
+                    contentStream.endText();
+
+                    yPosition -= 15;
+                    contentStream.beginText();
+                    contentStream.newLineAtOffset(70, yPosition);
+                    contentStream.showText(sender.getAddress());
+                    contentStream.endText();
+
+                    yPosition -= 15;
+                    contentStream.beginText();
+                    contentStream.newLineAtOffset(70, yPosition);
+                    contentStream.showText("Zone: " + sender.getZone());
+                    contentStream.endText();
+                } else {
+                    yPosition -= 20;
+                    contentStream.beginText();
+                    contentStream.setFont(normalFont, 12);
+                    contentStream.newLineAtOffset(70, yPosition);
+                    contentStream.showText("Customer ID: " + invoice.getSenderId());
+                    contentStream.endText();
+                }
             }
             
             // Recipient information
@@ -458,26 +462,35 @@ public class Pdfreportexporter {
             contentStream.showText("To:");
             contentStream.endText();
             
-            if (invoice.getRecipient() != null) {
-                Customer recipient = invoice.getRecipient();
-                yPosition -= 20;
-                contentStream.beginText();
-                contentStream.setFont(normalFont, 12);
-                contentStream.newLineAtOffset(70, yPosition);
-                contentStream.showText(recipient.getFirstName() + " " + recipient.getLastName());
-                contentStream.endText();
-                
-                yPosition -= 15;
-                contentStream.beginText();
-                contentStream.newLineAtOffset(70, yPosition);
-                contentStream.showText(recipient.getAddress());
-                contentStream.endText();
-                
-                yPosition -= 15;
-                contentStream.beginText();
-                contentStream.newLineAtOffset(70, yPosition);
-                contentStream.showText("Zone: " + recipient.getZone());
-                contentStream.endText();
+            if (invoice.getRecipentId() != null) {
+                userModule.Customer recipient = databaseModule.uDAO.CustomerDAO.retrieveCustomerById(invoice.getRecipentId());
+                if (recipient != null) {
+                    yPosition -= 20;
+                    contentStream.beginText();
+                    contentStream.setFont(normalFont, 12);
+                    contentStream.newLineAtOffset(70, yPosition);
+                    contentStream.showText(recipient.getFirstName() + " " + recipient.getLastName());
+                    contentStream.endText();
+
+                    yPosition -= 15;
+                    contentStream.beginText();
+                    contentStream.newLineAtOffset(70, yPosition);
+                    contentStream.showText(recipient.getAddress());
+                    contentStream.endText();
+
+                    yPosition -= 15;
+                    contentStream.beginText();
+                    contentStream.newLineAtOffset(70, yPosition);
+                    contentStream.showText("Zone: " + recipient.getZone());
+                    contentStream.endText();
+                } else {
+                    yPosition -= 20;
+                    contentStream.beginText();
+                    contentStream.setFont(normalFont, 12);
+                    contentStream.newLineAtOffset(70, yPosition);
+                    contentStream.showText("Customer ID: " + invoice.getRecipentId());
+                    contentStream.endText();
+                }
             }
             
             // Shipment details
@@ -602,8 +615,6 @@ public class Pdfreportexporter {
         }
     }
     
-    }
-    
     // Helper methods for revenue calculations
     public static double calculateRevenueBetweenDates(LocalDate startDate, LocalDate endDate) {
         List<Invoice> allInvoices = InvoiceDAO.readAllInvoices();
@@ -634,11 +645,15 @@ public class Pdfreportexporter {
         
         List<Invoice> allInvoices = InvoiceDAO.readAllInvoices();
         for (Invoice invoice : allInvoices) {
-            if (invoice.getIssueDate() != null && invoice.getRecipient() != null) {
+            if (invoice.getIssueDate() != null && invoice.getRecipentId() != null) {
                 LocalDate issueDate = invoice.getIssueDate().toLocalDate();
                 if (!issueDate.isBefore(startDate) && !issueDate.isAfter(endDate)) {
-                    int zone = invoice.getRecipient().getZone();
-                    revenueByZone.merge(zone, invoice.getTotalAmount(), Double::sum);
+                    // Need to get customer by ID to get the zone
+                    userModule.Customer recipient = databaseModule.uDAO.CustomerDAO.retrieveCustomerById(invoice.getRecipentId());
+                    if (recipient != null) {
+                        int zone = recipient.getZone();
+                        revenueByZone.merge(zone, invoice.getTotalAmount(), Double::sum);
+                    }
                 }
             }
         }
@@ -680,8 +695,6 @@ public class Pdfreportexporter {
     }
     
     //gets Shipments by period (daily, weekly, monthly)
-    }
-    
     private static Map<String, Integer> getShipmentsByPeriod(LocalDate startDate, LocalDate endDate, String period) {
         Map<String, Integer> shipmentsByPeriod = new java.util.HashMap<>();
         
@@ -748,8 +761,6 @@ public class Pdfreportexporter {
             }
         }
         return count;
-    }
-    
     }
     
     private static Map<Integer, Map<String, Integer>> getPerformanceByZone(LocalDate startDate, LocalDate endDate) {

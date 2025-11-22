@@ -1,7 +1,6 @@
 package billingAndPaymentModule;
 
 import shipmentModule.Shipment;
-import userModule.Customer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +9,8 @@ import java.util.Objects;
 public class Invoice {
     private String invoiceNum;
     private Shipment shipment;
-    private Customer sender;
-    private Customer recipient;
+    private String senderId;  
+    private String recipentId;
     private double totalAmount;
     private LocalDateTime issueDate;
     private LocalDateTime dueDate;
@@ -22,8 +21,8 @@ public class Invoice {
     // Constructor for creating an invoice from a shipment
     public Invoice(Shipment shipment) {
         this.shipment = shipment;
-        this.sender = shipment.getSender();
-        this.recipient = shipment.getRecipent();
+        this.senderId = shipment.getSender().getCustId();
+        this.recipentId = shipment.getRecipent().getCustId();
         this.totalAmount = shipment.getShippingCost();
         this.issueDate = LocalDateTime.now();
         this.dueDate = this.issueDate.plusDays(30); // Default 30 days due date
@@ -33,19 +32,19 @@ public class Invoice {
         this.notes = "Invoice for shipment: " + shipment.getTrackingNumber();
     }
 
-    // Parameterized constructor with all fields
-    public Invoice(Shipment shipment, Customer sender, Customer recipient,
-                   double totalAmount, LocalDateTime issueDate, LocalDateTime dueDate, 
-                   InvoiceStatus status, List<Payment> payments, String notes) {
-        this.invoiceNum = generateInvoiceNumber();
+    // Parameterized constructor with all fields (matching database schema)
+    public Invoice(String invoiceNum, Shipment shipment, String senderID, String recipentId,
+                   double totalAmount, LocalDateTime issueDate, LocalDateTime dueDate,
+                   InvoiceStatus status, String notes) {
+        this.invoiceNum = invoiceNum;
         this.shipment = shipment;
-        this.sender = sender;
-        this.recipient = recipient;
+        this.senderId = senderId;
+        this.recipentId = recipentId;
         this.totalAmount = totalAmount;
         this.issueDate = issueDate;
         this.dueDate = dueDate;
         this.status = status;
-        this.payments = payments != null ? new ArrayList<>(payments) : new ArrayList<>();
+        this.payments = new ArrayList<>();  // Initialize empty list, will be populated when needed
         this.notes = notes;
     }
 
@@ -53,8 +52,8 @@ public class Invoice {
     public Invoice(Invoice other) {
         this.invoiceNum = other.invoiceNum;
         this.shipment = other.shipment != null ? new Shipment(other.shipment) : null;
-        this.sender = other.sender != null ? new Customer(other.sender) : null;
-        this.recipient = other.recipient != null ? new Customer(other.recipient) : null;
+        this.senderId = other.senderId;
+        this.recipentId = other.recipentId;
         this.totalAmount = other.totalAmount;
         this.issueDate = other.issueDate;
         this.dueDate = other.dueDate;
@@ -123,8 +122,8 @@ public class Invoice {
         return invoiceNum;
     }
 
-    public void setInvoiceNum(String invoiceNumber) {
-        this.invoiceNum = invoiceNumber;
+    public void setInvoiceNum(String invoiceNum) {
+        this.invoiceNum = invoiceNum;
     }
 
     public Shipment getShipment() {
@@ -135,20 +134,20 @@ public class Invoice {
         this.shipment = shipment;
     }
 
-    public Customer getSender() {
-        return sender;
+    public String getSenderId() {
+        return senderId;
     }
 
-    public void setSender(Customer sender) {
-        this.sender = sender;
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
-    public Customer getRecipient() {
-        return recipient;
+    public String getRecipentId() {
+        return recipentId;
     }
 
-    public void setRecipient(Customer recipient) {
-        this.recipient = recipient;
+    public void setRecipentId(String recipentId) {
+        this.recipentId = recipentId;
     }
 
     public double getTotalAmount() {
@@ -209,8 +208,8 @@ public class Invoice {
         return Double.compare(invoice.totalAmount, totalAmount) == 0 &&
                Objects.equals(invoiceNum, invoice.invoiceNum) &&
                Objects.equals(shipment, invoice.shipment) &&
-               Objects.equals(sender, invoice.sender) &&
-               Objects.equals(recipient, invoice.recipient) &&
+               Objects.equals(senderId, invoice.senderId) &&
+               Objects.equals(recipentId, invoice.recipentId) &&
                Objects.equals(issueDate, invoice.issueDate) &&
                Objects.equals(dueDate, invoice.dueDate) &&
                status == invoice.status &&
@@ -220,7 +219,7 @@ public class Invoice {
 
     @Override
     public int hashCode() {
-        return Objects.hash(invoiceNum, shipment, sender, recipient, totalAmount,
+        return Objects.hash(invoiceNum, shipment, senderId, recipentId, totalAmount,
                            issueDate, dueDate, status, payments, notes);
     }
 
@@ -229,8 +228,8 @@ public class Invoice {
         return "Invoice{" +
                 "invoiceNum='" + invoiceNum + '\'' +
                 ", shipment=" + (shipment != null ? shipment.getTrackingNumber() : "null") +
-                ", sender=" + (sender != null ? sender.getCustId() : "null") +
-                ", recipient=" + (recipient != null ? recipient.getCustId() : "null") +
+                ", senderID=" + senderId +
+                ", recipentId=" + recipentId +
                 ", totalAmount=" + totalAmount +
                 ", issueDate=" + issueDate +
                 ", dueDate=" + dueDate +
