@@ -1,4 +1,4 @@
-# **SmartShip Package Management System**
+# **SmartShip Package Management System.**
 
 A full-stack Java application designed to manage shipments, fleets, billing, and user operations for a courier company.
 Built as a group project for the **Advanced Programming (CIT3009)** course at the University of Technology, Jamaica.
