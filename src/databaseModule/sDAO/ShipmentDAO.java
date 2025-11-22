@@ -25,7 +25,7 @@ public class ShipmentDAO {
 	
 	// Insert a shipment record into DB using Shipment object
     public static void insertShipmentRecord(Shipment s) {
-        String sql = "INSERT INTO shipment (trackingNumber, senderId, recipentId, weight, length, width, height, PackageType, ShipmentType, shippingCost, createdDate, devilveredDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO shipment (trackingNumber, senderId, recipentId, weight, length, width, height, PackageType, ShipmentType, shippingCost, createdDate, deliveredDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, s.getTrackingNumber());
@@ -77,7 +77,7 @@ public class ShipmentDAO {
 
     // Update shipment record
     public static void updateShipmentRecord(Shipment s) {
-        String sql = "UPDATE shipment SET senderId = ?, recipentId = ?, weight = ?, length = ?, width = ?, height = ?, PackageType = ?, ShipmentType = ?, shippingCost = ?, createdDate = ?, devilveredDate = ? WHERE trackingNumber = ?";
+        String sql = "UPDATE shipment SET senderId = ?, recipentId = ?, weight = ?, length = ?, width = ?, height = ?, PackageType = ?, ShipmentType = ?, shippingCost = ?, createdDate = ?, deliveredDate = ? WHERE trackingNumber = ?";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, s.getSender().getCustId());
@@ -110,7 +110,7 @@ public class ShipmentDAO {
 
     // Retrieve shipment by tracking number
     public static Shipment retrieveShipmentByTrackingNumber(String trackingNumber) {
-        String sql = "SELECT trackingNumber, senderId, recipentId, weight, length, width, height, PackageType, ShipmentType, shippingCost, createdDate, devilveredDate FROM shipment WHERE trackingNumber = ?";
+        String sql = "SELECT trackingNumber, senderId, recipentId, weight, length, width, height, PackageType, ShipmentType, shippingCost, createdDate, deliveredDate FROM shipment WHERE trackingNumber = ?";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, trackingNumber);
@@ -129,7 +129,7 @@ public class ShipmentDAO {
     // Read all shipments
     public static List<Shipment> readAllShipments() {
         List<Shipment> list = new ArrayList<>();
-        String sql = "SELECT trackingNumber, senderId, recipentId, weight, length, width, height, PackageType, ShipmentType, shippingCost, createdDate, devilveredDate FROM shipment";
+        String sql = "SELECT trackingNumber, senderId, recipentId, weight, length, width, height, PackageType, ShipmentType, shippingCost, createdDate, deliveredDate FROM shipment";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -159,7 +159,7 @@ public class ShipmentDAO {
         Timestamp createdTs = rs.getTimestamp("createdDate");
         Timestamp deliveredTs = null;
         try {
-            deliveredTs = rs.getTimestamp("devilveredDate");
+            deliveredTs = rs.getTimestamp("deliveredDate");
         } catch (SQLException e) {
             // column may not exist or be malformed; treat as null
         }

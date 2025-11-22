@@ -5,15 +5,14 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.IsoFields;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-
 import billingAndPaymentModule.Invoice;
 import shipmentModule.Shipment;
 import vehicleAndRoutingModule.Vehicle;
@@ -194,6 +193,8 @@ public class Pdfreportexporter {
         }
     }
     
+    }
+    
     public static void exportDeliveryPerformanceReport(String filePath, LocalDate startDate, LocalDate endDate) {
         PDDocument document = new PDDocument();
         try {
@@ -297,6 +298,8 @@ public class Pdfreportexporter {
         }
     }
     
+    }
+    
     public static void exportVehicleUtilizationReport(String filePath, LocalDate startDate, LocalDate endDate) {
         PDDocument document = new PDDocument();
         try {
@@ -368,6 +371,8 @@ public class Pdfreportexporter {
                 e.printStackTrace();
             }
         }
+    }
+    
     }
     
     // Helper method to export a single invoice as PDF
@@ -597,10 +602,10 @@ public class Pdfreportexporter {
         }
     }
     
+    }
+    
     // Helper methods for revenue calculations
-    private static double calculateRevenueBetweenDates(LocalDate startDate, LocalDate endDate) {
-        // This method would typically query the database for invoices within the date range
-        // For now, we'll return a placeholder calculation
+    public static double calculateRevenueBetweenDates(LocalDate startDate, LocalDate endDate) {
         List<Invoice> allInvoices = InvoiceDAO.readAllInvoices();
         double totalRevenue = 0.0;
         
@@ -642,7 +647,7 @@ public class Pdfreportexporter {
     }
     
     // Helper methods for shipment volume
-    private static int getShipmentCountBetweenDates(LocalDate startDate, LocalDate endDate) {
+    public static int getShipmentCountBetweenDates(LocalDate startDate, LocalDate endDate) {
         List<Shipment> allShipments = ShipmentDAO.readAllShipments();
         int count = 0;
         
@@ -658,6 +663,7 @@ public class Pdfreportexporter {
         return count;
     }
     
+    //Gets total shipment weight between dates
     private static double getTotalShipmentWeightBetweenDates(LocalDate startDate, LocalDate endDate) {
         List<Shipment> allShipments = ShipmentDAO.readAllShipments();
         double totalWeight = 0.0;
@@ -670,8 +676,10 @@ public class Pdfreportexporter {
                 }
             }
         }
-        
         return totalWeight;
+    }
+    
+    //gets Shipments by period (daily, weekly, monthly)
     }
     
     private static Map<String, Integer> getShipmentsByPeriod(LocalDate startDate, LocalDate endDate, String period) {
@@ -690,13 +698,14 @@ public class Pdfreportexporter {
         
         return shipmentsByPeriod;
     }
-    
+
+    // Gets the period key for a given date and period type
     private static String getPeriodKey(LocalDate date, String period) {
         switch (period.toLowerCase()) {
             case "daily":
                 return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             case "weekly":
-                return "Week " + date.getYear() + "-W" + date.getWeekOfYear();
+                return "Week " + date.getYear() + "-W" + date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
             case "monthly":
                 return date.format(DateTimeFormatter.ofPattern("yyyy-MM"));
             default:
@@ -704,6 +713,7 @@ public class Pdfreportexporter {
         }
     }
     
+    // Gets delivered and overdue shipment counts
     // Helper methods for delivery performance
     private static int getDeliveredShipmentCountBetweenDates(LocalDate startDate, LocalDate endDate) {
         List<Shipment> allShipments = ShipmentDAO.readAllShipments();
@@ -737,8 +747,9 @@ public class Pdfreportexporter {
                 }
             }
         }
-        
         return count;
+    }
+    
     }
     
     private static Map<Integer, Map<String, Integer>> getPerformanceByZone(LocalDate startDate, LocalDate endDate) {
@@ -769,35 +780,6 @@ public class Pdfreportexporter {
         return calculateRevenueByZone(startDate, endDate);
     }
 
-    public static int getShipmentCountBetweenDates(LocalDate startDate, LocalDate endDate) {
-        List<Shipment> allShipments = ShipmentDAO.readAllShipments();
-        int count = 0;
-
-        for (Shipment shipment : allShipments) {
-            if (shipment.getCreatedDate() != null) {
-                LocalDate creationDate = shipment.getCreatedDate().toLocalDate();
-                if (!creationDate.isBefore(startDate) && !creationDate.isAfter(endDate)) {
-                    count++;
-                }
-            }
-        }
-
-        return count;
-    }
-
-    public static double calculateRevenueBetweenDates(LocalDate startDate, LocalDate endDate) {
-        List<Invoice> allInvoices = InvoiceDAO.readAllInvoices();
-        double totalRevenue = 0.0;
-
-        for (Invoice invoice : allInvoices) {
-            if (invoice.getIssueDate() != null) {
-                LocalDate issueDate = invoice.getIssueDate().toLocalDate();
-                if (!issueDate.isBefore(startDate) && !issueDate.isAfter(endDate)) {
-                    totalRevenue += invoice.getTotalAmount();
-                }
-            }
-        }
-
-        return totalRevenue;
-    }
-}
+ }
+ 
+ 

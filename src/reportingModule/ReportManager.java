@@ -3,7 +3,6 @@ package reportingModule;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-
 import billingAndPaymentModule.Invoice;
 import shipmentModule.Shipment;
 import vehicleAndRoutingModule.Vehicle;
@@ -11,9 +10,7 @@ import databaseModule.bapDAO.InvoiceDAO;
 import databaseModule.sDAO.ShipmentDAO;
 import databaseModule.varDAO.VehicleDAO;
 
-/**
- * ReportManager class provides methods for generating various business reports
- */
+//ReportManager class provides methods for generating various business reports
 public class ReportManager {
     
     /**
