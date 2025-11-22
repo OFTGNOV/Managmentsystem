@@ -101,6 +101,26 @@ public class CustomerDAO {
         }
     }
 
+	//Retrieve Customer by email
+    public static Customer retrieveCustomerByEmail(String email) {
+        String sql = "SELECT u.ID, u.Fname, u.Lname, u.email, u.password, u.salt, c.custID, c.address, c.zone " +
+                "FROM customer c JOIN `user` u ON c.UserID = u.ID WHERE u.email = ?";
+        try (Connection conn = DBHelper.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Customer c = mapResultSetToCustomer(rs);
+                    return c;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error retrieving customer by email: " + e.getMessage());
+        }
+        return null;
+    }
+
 	//Retrieve Customer by custID
     public static Customer retrieveCustomerById(String custID) {
 	    String sql = "SELECT u.ID, u.Fname, u.Lname, u.email, u.password, u.salt, c.custID, c.address, c.zone " +
