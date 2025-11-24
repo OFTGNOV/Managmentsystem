@@ -34,6 +34,15 @@ The project was designed to:
 
 ---
 
+## **👥 Team Members and Responsibilities**
+
+* **Dantae Shirley (2304900)**: User and Customer Management, Software Architecture of the code
+* **Raheem Olakunle (2304979)**: Shipment Module
+* **Davanea Morsby (2303839)**: Vehicle & Scheduling Module, Reporting Module
+* **Tamai Richards (2301563)**: Billing & Payment Module, Entity Design and Requirements
+
+---
+
 ## **👤 User Roles & Capabilities**
 
 ### **Customer**
