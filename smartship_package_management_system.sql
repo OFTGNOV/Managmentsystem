@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Nov 22, 2025 at 05:33 AM
+-- Generation Time: Nov 27, 2025 at 09:57 PM
 -- Server version: 5.6.13
 -- PHP Version: 5.4.17
 
@@ -25,65 +25,14 @@ USE `smartship_package_management_system`;
 -- --------------------------------------------------------
 
 --
--- Table structure for table `clerk`
---
-
-CREATE TABLE IF NOT EXISTS `clerk` (
-  `clerkID` varchar(20) NOT NULL,
-  `UserID` mediumint(8) unsigned NOT NULL,
-  PRIMARY KEY (`clerkID`),
-  UNIQUE KEY `fk_user_id_clk` (`UserID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Child Class of User';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `customer`
---
-
-CREATE TABLE IF NOT EXISTS `customer` (
-  `custID` varchar(300) NOT NULL,
-  `address` varchar(250) NOT NULL,
-  `zone` int(10) NOT NULL,
-  `UserID` mediumint(8) unsigned NOT NULL,
-  PRIMARY KEY (`custID`),
-  UNIQUE KEY `UserID` (`UserID`),
-  KEY `fk_user_id_cust` (`UserID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Child Class of User';
-
---
--- Dumping data for table `customer`
---
-
-INSERT INTO `customer` (`custID`, `address`, `zone`, `UserID`) VALUES
-('CUST-1763782047588-4560', '9 Blue Way', 3, 7),
-('CUST-1763782838167-7528', '102 Trunck Drive', 1, 9),
-('CUST-1763786827716-6416', '7 Baltimore Ave', 2, 10);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `driver`
---
-
-CREATE TABLE IF NOT EXISTS `driver` (
-  `DLN` varchar(20) NOT NULL COMMENT 'Drivers License Numer',
-  `UserID` mediumint(8) unsigned NOT NULL,
-  PRIMARY KEY (`DLN`),
-  UNIQUE KEY `UserID` (`UserID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Child Class of User';
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `invoice`
 --
 
 CREATE TABLE IF NOT EXISTS `invoice` (
-  `invoiceNum` varchar(50) NOT NULL,
+  `invoiceID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `shipment_trackingNumber` varchar(50) NOT NULL,
-  `senderId` varchar(50) NOT NULL,
-  `recipentId` varchar(50) NOT NULL,
+  `senderId` int(10) unsigned NOT NULL,
+  `recipentId` int(10) unsigned NOT NULL,
   `totalAmount` double(10,2) NOT NULL,
   `issueDate` datetime NOT NULL,
   `dueDate` datetime NOT NULL,
@@ -91,31 +40,11 @@ CREATE TABLE IF NOT EXISTS `invoice` (
   `notes` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`invoiceNum`),
+  PRIMARY KEY (`invoiceID`),
   UNIQUE KEY `shipmentTackingNumber` (`shipment_trackingNumber`),
-  UNIQUE KEY `senderId` (`senderId`),
-  UNIQUE KEY `recipentId` (`recipentId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `invoice`
---
-
-INSERT INTO `invoice` (`invoiceNum`, `shipment_trackingNumber`, `senderId`, `recipentId`, `totalAmount`, `issueDate`, `dueDate`, `status`, `notes`, `created_at`, `updated_at`) VALUES
-('INV-1763787592473-8557', 'TRK4984ST', 'CUST-1763786827716-6416', 'CUST-1763782047588-4560', 28.84, '2025-11-21 23:59:52', '2025-12-21 23:59:52', 'PENDING', 'Invoice for shipment: TRK4984ST', '2025-11-22 04:59:52', '2025-11-22 04:59:52');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `manager`
---
-
-CREATE TABLE IF NOT EXISTS `manager` (
-  `mngID` varchar(20) NOT NULL,
-  `UserID` mediumint(8) unsigned NOT NULL,
-  PRIMARY KEY (`mngID`),
-  UNIQUE KEY `UserID` (`UserID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Child Class of User';
+  KEY `senderId` (`senderId`),
+  KEY `recipentId` (`recipentId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -130,11 +59,11 @@ CREATE TABLE IF NOT EXISTS `payment` (
   `paymentMethod` enum('CASH','CARD') NOT NULL,
   `status` enum('SUCCESS','FAILED','PENDING','CANCELLED','REFUNDED') NOT NULL DEFAULT 'PENDING',
   `referenceNumber` varchar(100) NOT NULL,
-  `invoiceNum` varchar(50) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `invoiceID` int(10) unsigned NOT NULL,
   PRIMARY KEY (`paymentId`),
-  UNIQUE KEY `invoiceNum` (`invoiceNum`)
+  UNIQUE KEY `invoiceNum` (`invoiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -144,14 +73,14 @@ CREATE TABLE IF NOT EXISTS `payment` (
 --
 
 CREATE TABLE IF NOT EXISTS `route` (
-  `routeNum` varchar(20) NOT NULL,
+  `routeID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `VehiclePlateNum` varchar(20) NOT NULL,
   `zone` int(2) NOT NULL,
   `startTime` datetime DEFAULT NULL,
   `endTime` datetime DEFAULT NULL,
-  PRIMARY KEY (`routeNum`),
+  PRIMARY KEY (`routeID`),
   UNIQUE KEY `vehicleId` (`VehiclePlateNum`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -161,11 +90,11 @@ CREATE TABLE IF NOT EXISTS `route` (
 
 CREATE TABLE IF NOT EXISTS `route_shipments` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
-  `routeNum` varchar(20) NOT NULL,
+  `routeID` int(10) unsigned NOT NULL,
   `shipmentTrackingNumber` varchar(20) NOT NULL,
   `assignedDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `routeNum` (`routeNum`),
+  UNIQUE KEY `routeNum` (`routeID`),
   UNIQUE KEY `shipmentTackingNumber` (`shipmentTrackingNumber`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT=' -- LINKING TABLE: Route-Shipments (for shipments planned for routes)' AUTO_INCREMENT=1 ;
 
@@ -177,28 +106,21 @@ CREATE TABLE IF NOT EXISTS `route_shipments` (
 
 CREATE TABLE IF NOT EXISTS `shipment` (
   `trackingNumber` varchar(30) NOT NULL,
-  `senderId` varchar(30) NOT NULL,
-  `recipentId` varchar(30) NOT NULL,
-  `weight` double(3,2) NOT NULL COMMENT 'kg',
+  `senderId` int(10) unsigned NOT NULL,
+  `recipentId` int(10) unsigned NOT NULL,
+  `weight` double(10,2) NOT NULL COMMENT 'kg',
   `length` double(10,2) NOT NULL COMMENT 'cm',
   `width` double(10,2) NOT NULL COMMENT 'cm',
-  `height` double(4,2) NOT NULL COMMENT 'cm',
+  `height` double(10,2) NOT NULL COMMENT 'cm',
   `PackageType` enum('STANDARD','EXPRESS','FRAGILE','') NOT NULL,
   `ShipmentType` enum('PENDING','ASSIGNED','IN_TRANSIT','DELIVERED','CANCELLED') NOT NULL,
   `shippingCost` double(10,2) NOT NULL,
   `createdDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deliveredDate` datetime DEFAULT NULL,
   PRIMARY KEY (`trackingNumber`),
-  UNIQUE KEY `senderId` (`senderId`),
-  UNIQUE KEY `recipentId` (`recipentId`)
+  KEY `senderId` (`senderId`),
+  KEY `recipentId` (`recipentId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Links back to Shipment.java';
-
---
--- Dumping data for table `shipment`
---
-
-INSERT INTO `shipment` (`trackingNumber`, `senderId`, `recipentId`, `weight`, `length`, `width`, `height`, `PackageType`, `ShipmentType`, `shippingCost`, `createdDate`, `deliveredDate`) VALUES
-('TRK4984ST', 'CUST-1763786827716-6416', 'CUST-1763782047588-4560', 2.00, 12.00, 12.00, 12.00, 'EXPRESS', 'PENDING', 28.84, '2025-11-21 23:59:49', NULL);
 
 -- --------------------------------------------------------
 
@@ -207,27 +129,18 @@ INSERT INTO `shipment` (`trackingNumber`, `senderId`, `recipentId`, `weight`, `l
 --
 
 CREATE TABLE IF NOT EXISTS `user` (
-  `ID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Fname` varchar(20) NOT NULL,
   `Lname` varchar(20) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `userType` enum('MANAGE','CLERK','CUSTOMER','DRIVER') NOT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `zone` int(5) DEFAULT NULL,
   `password` varchar(250) NOT NULL,
   `salt` varchar(250) NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Main Parent Class for users. To be used with user.java' AUTO_INCREMENT=11 ;
-
---
--- Dumping data for table `user`
---
-
-INSERT INTO `user` (`ID`, `Fname`, `Lname`, `email`, `password`, `salt`) VALUES
-(4, 'Tamai', 'Richards', 'tamai100009@gmail.com', 'chARBk+Yk85U3Cjv25IJ/3d2bV3Q9beufQcoojRynQA=', 'rikkofPSBHnKXQ50VMyzjw=='),
-(5, 'John', 'Staymos', 'johnstay@gmail.com', 'mzK/Bq3LyzedWEjcBa7lPPypl60cnADyZDpOVlkXZMg=', 'tlNShjBu3TmJXxUTLTLRsQ=='),
-(7, 'Yellow', 'Man', 'yellowman@gmail.com', 'L2gcLY88UmcbSyuiFBBhfphS06+6l0C8+ATDXOoEm0c=', 'eqEt69YNQ0lsUTvvw2GFtg=='),
-(8, 'Blue', 'Johnson', 'bjohson@gmail.com', 'oowyk9PX9/tpo3ic20YPlPk/+oUGjr6ZmnVDIsSuzPk=', 'wRy4LQLwVs5k8WKq6fpmlQ=='),
-(9, 'Steven', 'Young', 'styoung@gmail.com', 'lJhZuRi/oIaDuiFlG3AnUgZBLWN3RKe1pzA5jcfjSy0=', 'UKe6MsQced4VRabLpsqoAw=='),
-(10, 'Green', 'Guy', 'greenguy@gmail.com', 'A4z6bcibGOvfj/zjjf8KKkg5OC7r+iTKiz8ZR89w7tA=', 'sGQ2DMSZETK943EAk6Snqg==');
 
 -- --------------------------------------------------------
 
@@ -237,15 +150,15 @@ INSERT INTO `user` (`ID`, `Fname`, `Lname`, `email`, `password`, `salt`) VALUES
 
 CREATE TABLE IF NOT EXISTS `vehicle` (
   `licensePlate` varchar(20) NOT NULL,
+  `driverID` int(10) unsigned DEFAULT NULL,
   `vehicleType` varchar(20) NOT NULL,
   `maxWeightCapacity` decimal(10,2) NOT NULL,
   `maxPackageCapacity` int(11) NOT NULL,
   `currentWeight` double(10,2) NOT NULL DEFAULT '0.00',
   `currentPackageCount` int(11) NOT NULL DEFAULT '0',
-  `isAvailable` tinyint(1) NOT NULL DEFAULT '1',
-  `driversLicense` varchar(20) DEFAULT NULL,
+  `isAvailable` tinyint(1) NOT NULL,
   PRIMARY KEY (`licensePlate`),
-  UNIQUE KEY `driversLicense` (`driversLicense`)
+  UNIQUE KEY `driverID` (`driverID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -269,75 +182,51 @@ CREATE TABLE IF NOT EXISTS `vehicle_shipments` (
 --
 
 --
--- Constraints for table `clerk`
---
-ALTER TABLE `clerk`
-  ADD CONSTRAINT `fk_user_id_clk` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `customer`
---
-ALTER TABLE `customer`
-  ADD CONSTRAINT `fk_user_id_cust` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `driver`
---
-ALTER TABLE `driver`
-  ADD CONSTRAINT `fk_user_id_drv` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
 -- Constraints for table `invoice`
 --
 ALTER TABLE `invoice`
-  ADD CONSTRAINT `fk_invoice_recipentId` FOREIGN KEY (`recipentId`) REFERENCES `customer` (`custID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_invoice_senderId` FOREIGN KEY (`senderID`) REFERENCES `customer` (`custID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_invoice_shipmentTrackingNum` FOREIGN KEY (`shipment_trackingNumber`) REFERENCES `shipment` (`trackingNumber`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `manager`
---
-ALTER TABLE `manager`
-  ADD CONSTRAINT `fk_user_id_mng` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_rID_invoice` FOREIGN KEY (`recipentId`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_sID_invoice` FOREIGN KEY (`senderId`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_trackingNum_invoice` FOREIGN KEY (`shipment_trackingNumber`) REFERENCES `shipment` (`trackingNumber`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
 -- Constraints for table `payment`
 --
 ALTER TABLE `payment`
-  ADD CONSTRAINT `fk_payment_invoiceNum` FOREIGN KEY (`invoiceNum`) REFERENCES `invoice` (`invoiceNum`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_iNum_payment` FOREIGN KEY (`invoiceID`) REFERENCES `invoice` (`invoiceID`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
 -- Constraints for table `route`
 --
 ALTER TABLE `route`
-  ADD CONSTRAINT `fk_vehiclePlateNum` FOREIGN KEY (`VehiclePlateNum`) REFERENCES `vehicle` (`licensePlate`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_lPlate_route` FOREIGN KEY (`VehiclePlateNum`) REFERENCES `vehicle_shipments` (`licensePlate`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
 -- Constraints for table `route_shipments`
 --
 ALTER TABLE `route_shipments`
-  ADD CONSTRAINT `fk_routeShipment_trackingNum` FOREIGN KEY (`shipmentTrackingNumber`) REFERENCES `shipment` (`trackingNumber`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_routeShipments_routeNum` FOREIGN KEY (`routeNum`) REFERENCES `route` (`routeNum`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_trackingNum_routeShipments` FOREIGN KEY (`shipmentTrackingNumber`) REFERENCES `shipment` (`trackingNumber`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_rID_routeShipments` FOREIGN KEY (`routeID`) REFERENCES `route` (`routeID`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
 -- Constraints for table `shipment`
 --
 ALTER TABLE `shipment`
-  ADD CONSTRAINT `fk_cust_id_recipentId` FOREIGN KEY (`recipentId`) REFERENCES `customer` (`custID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_cust_id_senderId` FOREIGN KEY (`senderId`) REFERENCES `customer` (`custID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_rID_shipment` FOREIGN KEY (`recipentId`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_sID_shipment` FOREIGN KEY (`senderId`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
 -- Constraints for table `vehicle`
 --
 ALTER TABLE `vehicle`
-  ADD CONSTRAINT `fk_driversLicense` FOREIGN KEY (`driversLicense`) REFERENCES `driver` (`DLN`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_dID_vehicle` FOREIGN KEY (`driverID`) REFERENCES `user` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `vehicle_shipments`
 --
 ALTER TABLE `vehicle_shipments`
-  ADD CONSTRAINT `fk_vehicleShipment_trackingNum` FOREIGN KEY (`shipmentTrackingNumber`) REFERENCES `shipment` (`trackingNumber`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_vehicleShipment_plateNum` FOREIGN KEY (`licensePlate`) REFERENCES `vehicle` (`licensePlate`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_trackingNum_vehicleShipment` FOREIGN KEY (`shipmentTrackingNumber`) REFERENCES `shipment` (`trackingNumber`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_plateNum_vehicleShipment` FOREIGN KEY (`licensePlate`) REFERENCES `vehicle` (`licensePlate`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

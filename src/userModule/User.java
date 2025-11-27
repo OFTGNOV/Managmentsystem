@@ -6,16 +6,22 @@ public class User {
     protected String Fname;
     protected String Lname;
     protected String email;
+    protected UserType userType;
+    protected String address; //Customer Address assigned when a customer signs up
+    protected int zone; // The zone a customer belongs to.
     protected String passwordHash;
     // Salt is used for unique hashing. Means even if two users have the same password, their hashes will differ.
     protected String salt; 
     
     ///Paramatized Contsturctor
-    public User(String Fname, String Lname, String email, String password) {
+    public User(String Fname, String Lname, String email, String password, UserType userType) {
     	this.ID = 0; // default ID, database layer should set this appropriately
         this.Fname = Fname;
         this.Lname = Lname;
         this.email = email;
+        this.userType = userType;
+        this.address = "";
+        this.zone = 0;
         // hash and store the provided password (can be null)
         setPassword(password);
     }
@@ -25,6 +31,9 @@ public class User {
         this.Fname = other.Fname;
         this.Lname = other.Lname;
         this.email = other.email;
+        this.userType = other.userType;
+        this.address = other.address;
+        this.zone = other.zone;
         this.passwordHash = other.passwordHash;
         this.salt = other.salt;
      
@@ -51,13 +60,6 @@ public class User {
         return PasswordHasher.verifyPassword(attemptedPassword.toCharArray(), this.salt, this.passwordHash);
     }
     
-    public String ToString() {
-        return  ", \nFirst Name: " + Fname + 
-                ", \nLast Name " + Lname + 
-                ", \nEmail: " + email + 
-                ", \nPasswordHash: " + passwordHash +
-                ", \nSalt: " + salt;
-    }
 
     // Getters and Setters
     public int getID() {
@@ -95,6 +97,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+    
+    public UserType getUserType() {
+		return userType;
+	}
+    
+    public void setUserType(UserType userType) {
+    			this.userType = userType;
     }
 
     // Expose only hash (avoid returning raw password)

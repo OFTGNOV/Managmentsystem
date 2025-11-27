@@ -180,10 +180,12 @@ public class CustomerPanel extends JPanel {
                         double cashAmount = Double.parseDouble(cashStr);
 
                         // Create cash payment
-                        Payment payment = new Payment(cashAmount,
+                        Payment payment = new Payment(0, // paymentId to be set by DAO
+                            cashAmount,
                             java.time.LocalDateTime.now(),
                             paymentMethod,
                             billingAndPaymentModule.PaymentStatus.PENDING,
+                            null, // referenceNumber will be generated
                             invoice.getInvoiceNum()); // Use the invoice number
 
                         // Process cash payment
@@ -214,10 +216,12 @@ public class CustomerPanel extends JPanel {
                             throw new Exception("Expiration date must be in MM/YYYY format");
 
                         // Create card payment
-                        Payment payment = new Payment(totalCost,
+                        Payment payment = new Payment(0, // paymentId to be set by DAO
+                            totalCost,
                             java.time.LocalDateTime.now(),
                             paymentMethod,
                             billingAndPaymentModule.PaymentStatus.SUCCESS,
+                            null, // referenceNumber will be generated
                             invoice.getInvoiceNum()); // Use the invoice number
 
                         payment.processPayment(totalCost, billingAndPaymentModule.PaymentMethod.CARD);
