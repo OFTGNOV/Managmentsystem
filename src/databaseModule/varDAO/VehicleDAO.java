@@ -10,8 +10,6 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import databaseModule.DBHelper;
 import databaseModule.sDAO.ShipmentDAO;
-import userModule.Driver;
-import databaseModule.uDAO.DriverDAO;
 import vehicleAndRoutingModule.Vehicle;
 
 /* Data Access Object for Vehicle entity
