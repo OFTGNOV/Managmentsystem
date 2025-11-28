@@ -8,9 +8,7 @@ import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 import userModule.User;
-import userModule.Manager;
-import userModule.Clerk;
-import userModule.Customer;
+import userModule.UserType;
 
 
 /* Database Helper Class

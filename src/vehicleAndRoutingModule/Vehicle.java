@@ -1,6 +1,6 @@
 package vehicleAndRoutingModule;
 
-import userModule.Driver;
+import userModule.User;
 import shipmentModule.Shipment;
 import shipmentModule.ShipmentStatus;
 import shipmentModule.ShipmentStatusListener;
@@ -12,7 +12,7 @@ import java.util.List;
  * Tracks capacity limits and current load.
 */
 public class Vehicle implements ShipmentStatusListener {
-    private Driver assignedDriver; // Driver assigned to this vehicle
+    private User assignedDriver; // User assigned to this vehicle (should be of type DRIVER)
     private String licensePlate;
     private String vehicleType; // van, truck, car, etc.
     private double maxWeightCapacity; // in kg
@@ -26,9 +26,9 @@ public class Vehicle implements ShipmentStatusListener {
     private Route currentRoute = null;
 
     // Parametrized Constructor
-    public Vehicle(Driver assignedDriver, String licensePlate, String vehicleType,
+    public Vehicle(User assignedDriver, String licensePlate, String vehicleType,
                     double maxWeightCapacity, int maxPackageCapacity) {
-        
+
         this.assignedDriver = assignedDriver;
         this.licensePlate = licensePlate;
         this.vehicleType = vehicleType;
@@ -150,11 +150,11 @@ public class Vehicle implements ShipmentStatusListener {
 	}
 
 	// Getters and Setters
-    public Driver getAssignedDriver() {
+    public User getAssignedDriver() {
         return assignedDriver;
     }
 
-    public void setAssignedDriver(Driver assignedDriver) {
+    public void setAssignedDriver(User assignedDriver) {
         this.assignedDriver = assignedDriver;
     }
 

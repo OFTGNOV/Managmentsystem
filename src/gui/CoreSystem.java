@@ -186,10 +186,8 @@ public class CoreSystem {
             UserDAO.insertUserRecord(recipient);
 
             // Create shipment with default values (will be updated by caller)
-            // Convert User objects to Customer objects for compatibility with Shipment class
-            Customer customerSender = new Customer((User)sender);
-            Customer customerRecipient = new Customer((User)recipient);
-            Shipment s = new Shipment(customerSender, customerRecipient, 1.0, 10.0, 10.0, 10.0, PackageType.STANDARD);
+            // Use User objects directly since Shipment now works with User class
+            Shipment s = new Shipment(sender, recipient, 1.0, 10.0, 10.0, 10.0, PackageType.STANDARD);
 
             // Save to database
             ShipmentDAO.insertShipmentRecord(s);
@@ -257,12 +255,13 @@ public class CoreSystem {
     // ------------------------------------------------------
     public Vehicle addVehicle(String licensePlate, double maxWeight, int maxPackages, String driverDLN) {
         try {
-            Driver driver = null;
+            User driver = null;
             if (driverDLN != null && !driverDLN.isEmpty()) {
-                // Look up the driver from the database
-                driver = DriverDAO.retrieveDriverByDln(driverDLN);
-                if (driver == null) {
-                    JOptionPane.showMessageDialog(null, "Driver with DLN " + driverDLN + " not found.");
+                // Look up the driver by email (since we no longer have a DLN field)
+                // We can search for the user by email instead
+                driver = UserDAO.retrieveUserRecordByEmail(driverDLN);
+                if (driver == null || driver.getUserType() != UserType.DRIVER) {
+                    JOptionPane.showMessageDialog(null, "Driver with email " + driverDLN + " not found or not a driver.");
                     return null;
                 }
             }
@@ -325,26 +324,26 @@ public class CoreSystem {
     // ------------------------------------------------------
     // DRIVER OPERATIONS
     // ------------------------------------------------------
-    public Driver addDriver(String firstName, String lastName, String email, String password, String driverLicenseNumber) {
+    public User addDriver(String firstName, String lastName, String email, String password, String driverLicenseNumber) {
         try {
             User user = new User(firstName, lastName, email, password, UserType.DRIVER);
             UserDAO.insertUserRecord(user);
-            // Return as Driver object for compatibility
-            return new Driver(user, driverLicenseNumber);
+            // Return User object since Driver class no longer exists as separate model
+            return user;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public List<Driver> listDrivers() {
+    public List<User> listDrivers() {
         try {
             List<User> allUsers = UserDAO.readAllUsers();
-            List<Driver> drivers = new ArrayList<>();
+            List<User> drivers = new ArrayList<>();
             for (User user : allUsers) {
                 if (user.getUserType() == UserType.DRIVER) {
-                    // Create Driver object with a default or stored DLN
-                    drivers.add(new Driver(user, "DL" + user.getID()));
+                    // Return User objects since Driver class no longer exists as separate model
+                    drivers.add(user);
                 }
             }
             return drivers;

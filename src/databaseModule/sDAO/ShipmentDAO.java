@@ -3,9 +3,9 @@ package databaseModule.sDAO;
 import shipmentModule.PackageType;
 import shipmentModule.Shipment;
 import shipmentModule.ShipmentStatus;
-import userModule.Customer;
+import userModule.User;
 import databaseModule.DBHelper;
-import databaseModule.uDAO.CustomerDAO;
+import databaseModule.uDAO.UserDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 
 public class ShipmentDAO {
     // Insert a shipment record into DB using parameters
-	public static void insertShipmentRecord(Customer sender, Customer recipent, double weight, 
+	public static void insertShipmentRecord(User sender, User recipent, double weight,
 			double length, double width, double height, PackageType pType) {
 		Shipment s = new Shipment(sender, recipent, weight, length, width, height, pType);
 		insertShipmentRecord(s);
@@ -29,8 +29,8 @@ public class ShipmentDAO {
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, s.getTrackingNumber());
-            ps.setString(2, s.getSender().getCustId());
-            ps.setString(3, s.getRecipent().getCustId());
+            ps.setInt(2, s.getSender().getID());
+            ps.setInt(3, s.getRecipent().getID());
             ps.setDouble(4, s.getWeight());
             ps.setDouble(5, s.getLength());
             ps.setDouble(6, s.getWidth());
@@ -80,8 +80,8 @@ public class ShipmentDAO {
         String sql = "UPDATE shipment SET senderId = ?, recipentId = ?, weight = ?, length = ?, width = ?, height = ?, PackageType = ?, ShipmentType = ?, shippingCost = ?, createdDate = ?, deliveredDate = ? WHERE trackingNumber = ?";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, s.getSender().getCustId());
-            ps.setString(2, s.getRecipent().getCustId());
+            ps.setInt(1, s.getSender().getID());
+            ps.setInt(2, s.getRecipent().getID());
             ps.setDouble(3, s.getWeight());
             ps.setDouble(4, s.getLength());
             ps.setDouble(5, s.getWidth());
@@ -147,8 +147,8 @@ public class ShipmentDAO {
     // Helper to map a ResultSet row to a Shipment object
     private static Shipment mapResultSetToShipment(ResultSet rs) throws SQLException {
         String trackingNumber = rs.getString("trackingNumber");
-        String senderId = rs.getString("senderId");
-        String recipentId = rs.getString("recipentId");
+        int senderId = rs.getInt("senderId");
+        int recipentId = rs.getInt("recipentId");
         double weight = rs.getDouble("weight");
         double length = rs.getDouble("length");
         double width = rs.getDouble("width");
@@ -164,9 +164,9 @@ public class ShipmentDAO {
             // column may not exist or be malformed; treat as null
         }
 
-        // Load Customer objects using CustomerDAO (which returns Customer by custID)
-        Customer sender = CustomerDAO.retrieveCustomerById(senderId);
-        Customer recipent = CustomerDAO.retrieveCustomerById(recipentId);
+        // Load User objects using UserDAO (which returns User by ID)
+        User sender = UserDAO.retrieveUserRecordById(senderId);
+        User recipent = UserDAO.retrieveUserRecordById(recipentId);
 
         PackageType pType = PackageType.STANDARD;
         try {

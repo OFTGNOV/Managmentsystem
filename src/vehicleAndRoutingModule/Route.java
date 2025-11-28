@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import shipmentModule.Shipment;
 import shipmentModule.ShipmentStatus;
-import userModule.Driver;
 
 /**
  * Route class represents a delivery route.

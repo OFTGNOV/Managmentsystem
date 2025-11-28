@@ -11,15 +11,18 @@ import javax.swing.JOptionPane;
 import databaseModule.DBHelper;
 import databaseModule.sDAO.ShipmentDAO;
 import vehicleAndRoutingModule.Vehicle;
+import userModule.User;
+import userModule.UserType;
+import databaseModule.uDAO.UserDAO;
 
 /* Data Access Object for Vehicle entity
  * Provides methods to perform CRUD operations on Vehicle data in the database
  */
 public class VehicleDAO {
 	
-	public static void insertVehicleRecord(Driver assignedDriver, String licensePlate, String vehicleType,
+	public static void insertVehicleRecord(User assignedDriver, String licensePlate, String vehicleType,
 			double maxWeightCapacity, int maxPackageCapacity) {
-		
+
 		Vehicle vehicle = new Vehicle(assignedDriver, licensePlate, vehicleType, maxWeightCapacity, maxPackageCapacity);
 		insertVehicleRecord(vehicle);
 	}
@@ -161,14 +164,14 @@ public class VehicleDAO {
         int currentPackageCount = rs.getInt("currentPackageCount");
         boolean isAvailable = rs.getBoolean("isAvailable");
 
-        Driver assignedDriver = null;
+        User assignedDriver = null;
         if (rs.wasNull()) {
             // No assigned driver
         } else {
-            // Retrieve driver by ID instead of DLN
+            // Retrieve driver by ID
             User user = databaseModule.uDAO.UserDAO.retrieveUserRecordById(driverID);
             if (user != null && user.getUserType() == userModule.UserType.DRIVER) {
-                assignedDriver = new Driver(user, "DL" + user.getID()); // Use default DLN
+                assignedDriver = user; // Use the User directly since Driver class no longer exists
             }
         }
 

@@ -3,12 +3,12 @@ package shipmentModule;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import userModule.Customer;
+import userModule.User;
 
 public class Shipment {
     private String trackingNumber;
-    private Customer sender;
-    private Customer recipent;            
+    private User sender;
+    private User recipent;            
     private double weight; //weight is in Kilograms
     private double length;     
     private double width;  //width, length and height are in Centimetes       
@@ -24,7 +24,7 @@ public class Shipment {
 
 
     // Paramtized Constructor
-    public Shipment(Customer sender, Customer recipent, double weight, 
+    public Shipment(User sender, User recipent, double weight,
                     double length, double width, double height, PackageType pType) {
         this.trackingNumber = generateTrackingNumber();
         this.sender = sender;
@@ -42,6 +42,8 @@ public class Shipment {
     // Copy Constructor
     public Shipment(Shipment other) {
         this.trackingNumber = other.trackingNumber;
+        this.sender = other.sender;
+        this.recipent = other.recipent;
         this.weight = other.weight;
         this.length = other.length;
         this.width = other.width;
@@ -123,17 +125,17 @@ public class Shipment {
     
     @Override
     public String toString() {
-        return "Shipment - trackingNumber=" + trackingNumber + 
-                ", \nSender: " + sender.getCustId()+ 
-                ", \nRecipent: " + recipent.getCustId() +
-                ", \nweight: " + weight + 
-                "kg, \nlength: " + length + 
-                "cm, \nwidth: " + width + 
-                "cm, \nheight: " + height + 
-                "cm, \nPackage Type: " + pType + 
-                ", \nStatus: " + status + 
-                String.format(", \nShipping Cost: $%.2f", shippingCost) +  
-                ", \nCreated Date: " + createdDate + 
+        return "Shipment - trackingNumber=" + trackingNumber +
+                ", \nSender: " + sender.getID()+
+                ", \nRecipent: " + recipent.getID() +
+                ", \nweight: " + weight +
+                "kg, \nlength: " + length +
+                "cm, \nwidth: " + width +
+                "cm, \nheight: " + height +
+                "cm, \nPackage Type: " + pType +
+                ", \nStatus: " + status +
+                String.format(", \nShipping Cost: $%.2f", shippingCost) +
+                ", \nCreated Date: " + createdDate +
                 ", \nDelivered Date: " + deliveredDate;
     }
     
@@ -159,19 +161,19 @@ public class Shipment {
         this.trackingNumber = trackingNumber;
     }
     
-    public Customer getSender() {
+    public User getSender() {
         return sender;
     }
-    
-    public void setSender(Customer sender) {
+
+    public void setSender(User sender) {
         this.sender = sender;
     }
-    
-    public Customer getRecipent() {
+
+    public User getRecipent() {
         return recipent;
     }
-    
-    public void setRecipent(Customer recipent) {
+
+    public void setRecipent(User recipent) {
         this.recipent = recipent;
     }
 

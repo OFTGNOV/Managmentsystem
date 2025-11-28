@@ -19,8 +19,8 @@ import vehicleAndRoutingModule.Vehicle;
 import databaseModule.bapDAO.InvoiceDAO;
 import databaseModule.sDAO.ShipmentDAO;
 import databaseModule.varDAO.VehicleDAO;
-import userModule.Customer;
 import userModule.User;
+import userModule.UserType;
 
 public class Pdfreportexporter {
     
@@ -424,7 +424,7 @@ public class Pdfreportexporter {
             contentStream.endText();
             
             if (invoice.getSenderId() != null) {
-                userModule.Customer sender = databaseModule.uDAO.CustomerDAO.retrieveCustomerById(invoice.getSenderId());
+                userModule.User sender = databaseModule.uDAO.UserDAO.retrieveUserRecordById(invoice.getSenderId());
                 if (sender != null) {
                     yPosition -= 20;
                     contentStream.beginText();
@@ -463,7 +463,7 @@ public class Pdfreportexporter {
             contentStream.endText();
             
             if (invoice.getRecipentId() != null) {
-                userModule.Customer recipient = databaseModule.uDAO.CustomerDAO.retrieveCustomerById(invoice.getRecipentId());
+                userModule.User recipient = databaseModule.uDAO.UserDAO.retrieveUserRecordById(invoice.getRecipentId());
                 if (recipient != null) {
                     yPosition -= 20;
                     contentStream.beginText();
@@ -488,7 +488,7 @@ public class Pdfreportexporter {
                     contentStream.beginText();
                     contentStream.setFont(normalFont, 12);
                     contentStream.newLineAtOffset(70, yPosition);
-                    contentStream.showText("Customer ID: " + invoice.getRecipentId());
+                    contentStream.showText("User ID: " + invoice.getRecipentId());
                     contentStream.endText();
                 }
             }
@@ -648,8 +648,8 @@ public class Pdfreportexporter {
             if (invoice.getIssueDate() != null && invoice.getRecipentId() != null) {
                 LocalDate issueDate = invoice.getIssueDate().toLocalDate();
                 if (!issueDate.isBefore(startDate) && !issueDate.isAfter(endDate)) {
-                    // Need to get customer by ID to get the zone
-                    userModule.Customer recipient = databaseModule.uDAO.CustomerDAO.retrieveCustomerById(invoice.getRecipentId());
+                    // Need to get user by ID to get the zone
+                    userModule.User recipient = databaseModule.uDAO.UserDAO.retrieveUserRecordById(invoice.getRecipentId());
                     if (recipient != null) {
                         int zone = recipient.getZone();
                         revenueByZone.merge(zone, invoice.getTotalAmount(), Double::sum);
