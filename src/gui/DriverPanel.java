@@ -30,10 +30,15 @@ public class DriverPanel extends JPanel {
         JPanel buttonPanel = new JPanel();
         updateStatusBtn = new JButton("Update Status");
         refreshBtn = new JButton("Refresh");
+        JButton signOutBtn = new JButton("Sign Out");
 
         buttonPanel.add(updateStatusBtn);
         buttonPanel.add(refreshBtn);
+        buttonPanel.add(signOutBtn);
         add(buttonPanel, BorderLayout.NORTH);
+
+        // Sign out button action
+        signOutBtn.addActionListener(e -> signOut());
 
         // Button actions
         updateStatusBtn.addActionListener(e -> updateShipmentStatus());
@@ -97,6 +102,22 @@ public class DriverPanel extends JPanel {
             }
         } else {
             JOptionPane.showMessageDialog(this, "Select a shipment to update");
+        }
+    }
+
+    private void signOut() {
+        // Clear current user from system
+        system.setCurrentUser(null, null);
+
+        // Find the SmartShipGUI frame and call showLoginPanel
+        Container parent = getParent();
+        while (parent != null && !(parent instanceof SmartShipGUI)) {
+            parent = parent.getParent();
+        }
+
+        if (parent instanceof SmartShipGUI) {
+            SmartShipGUI gui = (SmartShipGUI) parent;
+            gui.showLoginPanel();
         }
     }
 }

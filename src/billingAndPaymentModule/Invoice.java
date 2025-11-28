@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Invoice {
-    private String invoiceNum;
+    private int invoiceID;
     private Shipment shipment;
     private int senderId;
     private int recipentId;
@@ -28,15 +28,15 @@ public class Invoice {
         this.dueDate = this.issueDate.plusDays(30); // Default 30 days due date
         this.status = InvoiceStatus.PENDING;
         this.payments = new ArrayList<>();
-        this.invoiceNum = generateInvoiceNumber();
+        this.invoiceID = 0; // Default ID, will be set by database
         this.notes = "Invoice for shipment: " + shipment.getTrackingNumber();
     }
 
     // Parameterized constructor with all fields (matching database schema)
-    public Invoice(String invoiceNum, Shipment shipment, int senderID, int recipentId,
+    public Invoice(int invoiceID, Shipment shipment, int senderID, int recipentId,
                    double totalAmount, LocalDateTime issueDate, LocalDateTime dueDate,
                    InvoiceStatus status, String notes) {
-        this.invoiceNum = invoiceNum;
+        this.invoiceID = invoiceID;
         this.shipment = shipment;
         this.senderId = senderId;
         this.recipentId = recipentId;
@@ -50,7 +50,7 @@ public class Invoice {
 
     // Copy constructor
     public Invoice(Invoice other) {
-        this.invoiceNum = other.invoiceNum;
+        this.invoiceID = other.invoiceID;
         this.shipment = other.shipment != null ? new Shipment(other.shipment) : null;
         this.senderId = other.senderId;
         this.recipentId = other.recipentId;
@@ -62,10 +62,7 @@ public class Invoice {
         this.notes = other.notes;
     }
 
-    // Generate invoice number
-    private String generateInvoiceNumber() {
-        return "INV-" + System.currentTimeMillis() + "-" + (int)(Math.random() * 10000);
-    }
+    // Generate invoice number - no longer needed since we use database auto-increment ID
 
     // Add a payment to this invoice
     public void addPayment(Payment payment) {
@@ -118,12 +115,12 @@ public class Invoice {
 
 
     // Getters and Setters
-    public String getInvoiceNum() {
-        return invoiceNum;
+    public int getInvoiceID() {
+        return invoiceID;
     }
 
-    public void setInvoiceNum(String invoiceNum) {
-        this.invoiceNum = invoiceNum;
+    public void setInvoiceID(int invoiceID) {
+        this.invoiceID = invoiceID;
     }
 
     public Shipment getShipment() {
@@ -206,9 +203,9 @@ public class Invoice {
         if (o == null || getClass() != o.getClass()) return false;
         Invoice invoice = (Invoice) o;
         return Double.compare(invoice.totalAmount, totalAmount) == 0 &&
+               invoiceID == invoice.invoiceID &&
                senderId == invoice.senderId &&
                recipentId == invoice.recipentId &&
-               Objects.equals(invoiceNum, invoice.invoiceNum) &&
                Objects.equals(shipment, invoice.shipment) &&
                Objects.equals(issueDate, invoice.issueDate) &&
                Objects.equals(dueDate, invoice.dueDate) &&
@@ -219,7 +216,7 @@ public class Invoice {
 
     @Override
     public int hashCode() {
-        return Objects.hash(invoiceNum, shipment, senderId, recipentId, totalAmount,
+        return Objects.hash(invoiceID, shipment, senderId, recipentId, totalAmount,
                            issueDate, dueDate, status, payments, notes);
     }
 

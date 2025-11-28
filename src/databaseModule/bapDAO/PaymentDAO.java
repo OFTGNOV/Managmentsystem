@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 public class PaymentDAO {
     // Insert a new payment record
     public static void insertPaymentRecord(Payment payment) {
-        String sql = "INSERT INTO payment (amount, paymentDate, paymentMethod, status, referenceNumber, invoiceNum) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO payment (amount, paymentDate, paymentMethod, status, referenceNumber, invoiceID) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -22,7 +22,7 @@ public class PaymentDAO {
             ps.setString(3, payment.getPaymentMethod() == null ? billingAndPaymentModule.PaymentMethod.CARD.name() : payment.getPaymentMethod().name());
             ps.setString(4, payment.getStatus() == null ? PaymentStatus.PENDING.name() : payment.getStatus().name());
             ps.setString(5, payment.getReferenceNumber());
-            ps.setString(6, payment.getInvoiceNum());
+            ps.setInt(6, payment.getInvoiceID());
 
             int affected = ps.executeUpdate();
             if (affected == 0) {
@@ -45,7 +45,7 @@ public class PaymentDAO {
 
     // Update an existing payment record
     public static void updatePaymentRecord(Payment payment) {
-        String sql = "UPDATE payment SET amount = ?, paymentDate = ?, paymentMethod = ?, status = ?, referenceNumber = ?, invoiceNum = ? WHERE paymentId = ?";
+        String sql = "UPDATE payment SET amount = ?, paymentDate = ?, paymentMethod = ?, status = ?, referenceNumber = ?, invoiceID = ? WHERE paymentId = ?";
 
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -56,7 +56,7 @@ public class PaymentDAO {
             ps.setString(3, payment.getPaymentMethod() == null ? PaymentMethod.CARD.name() : payment.getPaymentMethod().name());
             ps.setString(4, payment.getStatus() == null ? PaymentStatus.PENDING.name() : payment.getStatus().name());
             ps.setString(5, payment.getReferenceNumber());
-            ps.setString(6, payment.getInvoiceNum());
+            ps.setInt(6, payment.getInvoiceID());
             ps.setInt(7, payment.getPaymentId());
 
             int affected = ps.executeUpdate();
@@ -115,7 +115,7 @@ public class PaymentDAO {
         String paymentMethodStr = rs.getString("paymentMethod");
         String statusStr = rs.getString("status");
         String referenceNumber = rs.getString("referenceNumber");
-        String invoiceNum = rs.getString("invoiceNum");
+        int invoiceID = rs.getInt("invoiceID");
 
         // Handle enums with default values
         billingAndPaymentModule.PaymentMethod paymentMethod = billingAndPaymentModule.PaymentMethod.CARD;
@@ -134,7 +134,7 @@ public class PaymentDAO {
             // default
         }
 
-        Payment payment = new Payment(paymentId, amount, paymentDate, paymentMethod, paymentStatus, referenceNumber, invoiceNum);
+        Payment payment = new Payment(paymentId, amount, paymentDate, paymentMethod, paymentStatus, referenceNumber, invoiceID);
         return payment;
     }
 }

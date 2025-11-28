@@ -52,6 +52,16 @@ public class ManagerPanel extends JPanel {
         bottom.add(generateDeliveryReportBtn);
         bottom.add(generateVehicleReportBtn);
 
+        // Add driver button
+        JButton addDriverBtn = new JButton("Add Driver");
+        JButton signOutBtn = new JButton("Sign Out");
+        bottom.add(addDriverBtn);
+        bottom.add(Box.createHorizontalStrut(10)); // Add some spacing
+        bottom.add(signOutBtn);
+
+        // Sign out button action
+        signOutBtn.addActionListener(e -> signOut());
+
         // Add vehicle button action
         addVehicleBtn.addActionListener(e -> {
             try {
@@ -106,9 +116,9 @@ public class ManagerPanel extends JPanel {
         });
 
         // Add driver button
-        JButton addDriverBtn = new JButton("Add Driver");
-        bottom.add(addDriverBtn);
-        addDriverBtn.addActionListener(e -> {
+        JButton addDriverBtn1 = new JButton("Add Driver");
+        bottom.add(addDriverBtn1);
+        addDriverBtn1.addActionListener(e -> {
             try {
                 String firstName = JOptionPane.showInputDialog(this, "Enter driver's first name:");
                 if (firstName == null || firstName.trim().isEmpty()) return;
@@ -276,6 +286,22 @@ public class ManagerPanel extends JPanel {
                     s.getStatus(),
                     s.getWeight()
             });
+        }
+    }
+
+    private void signOut() {
+        // Clear current user from system
+        system.setCurrentUser(null, null);
+
+        // Find the SmartShipGUI frame and call showLoginPanel
+        Container parent = getParent();
+        while (parent != null && !(parent instanceof SmartShipGUI)) {
+            parent = parent.getParent();
+        }
+
+        if (parent instanceof SmartShipGUI) {
+            SmartShipGUI gui = (SmartShipGUI) parent;
+            gui.showLoginPanel();
         }
     }
 }

@@ -31,14 +31,20 @@ public class ClerkPanel extends JPanel {
         JButton setInTransit = new JButton("Set In Transit");
         JButton setDelivered = new JButton("Set Delivered");
         JButton assignVehicle = new JButton("Assign Vehicle");
+        JButton signOutButton = new JButton("Sign Out");
 
         top.add(refreshBtn);
         top.add(setInTransit);
         top.add(setDelivered);
         top.add(assignVehicle);
+        top.add(Box.createHorizontalStrut(10)); // Add some spacing
+        top.add(signOutButton);
 
         add(top, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
+
+        // Sign out button action
+        signOutButton.addActionListener(e -> signOut());
 
         // Button actions
         refreshBtn.addActionListener((ActionEvent e) -> refresh());
@@ -136,6 +142,22 @@ public class ClerkPanel extends JPanel {
                     s.getStatus(),
                     s.getWeight()
             });
+        }
+    }
+
+    private void signOut() {
+        // Clear current user from system
+        system.setCurrentUser(null, null);
+
+        // Find the SmartShipGUI frame and call showLoginPanel
+        Container parent = getParent();
+        while (parent != null && !(parent instanceof SmartShipGUI)) {
+            parent = parent.getParent();
+        }
+
+        if (parent instanceof SmartShipGUI) {
+            SmartShipGUI gui = (SmartShipGUI) parent;
+            gui.showLoginPanel();
         }
     }
 }

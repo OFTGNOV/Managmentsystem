@@ -10,18 +10,18 @@ public class Payment {
     private PaymentMethod paymentMethod;
     private PaymentStatus status;
     private String referenceNumber; // For card transactions or other reference
-    private String invoiceNum; // Added to match database schema
+    private int invoiceID; // Added to match database schema
 
     // Full constructor used by DAOs and mappers
     public Payment(int paymentId, double amount, LocalDateTime paymentDate,
-                   PaymentMethod paymentMethod, PaymentStatus status, String referenceNumber, String invoiceNum) {
+                   PaymentMethod paymentMethod, PaymentStatus status, String referenceNumber, int invoiceID) {
         this.paymentId = paymentId;
         this.amount = amount;
         this.paymentDate = paymentDate;
         this.paymentMethod = paymentMethod;
         this.status = status;
         this.referenceNumber = referenceNumber;
-        this.invoiceNum = invoiceNum;
+        this.invoiceID = invoiceID;
     }
 
     // Constructor without invoiceNum (for new payments)
@@ -42,7 +42,7 @@ public class Payment {
         this.paymentMethod = other.paymentMethod;
         this.status = other.status;
         this.referenceNumber = other.referenceNumber;
-        this.invoiceNum = other.invoiceNum;
+        this.invoiceID = other.invoiceID;
     }
 
     // Generate reference number for the payment
@@ -150,11 +150,11 @@ public class Payment {
         this.referenceNumber = referenceNumber;
     }
 
-    public String getInvoiceNum() {
-        return invoiceNum;
+    public int getInvoiceID() {
+        return invoiceID;
     }
 
-    public void setInvoiceNum(String invoiceNum) {
-        this.invoiceNum = invoiceNum;
+    public void setInvoiceID(int invoiceID) {
+        this.invoiceID = invoiceID;
     }
 }

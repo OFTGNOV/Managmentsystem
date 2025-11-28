@@ -394,7 +394,7 @@ public class Pdfreportexporter {
             contentStream.beginText();
             contentStream.setFont(font, 12);
             contentStream.newLineAtOffset(50, yPosition);
-            contentStream.showText("Invoice Number: " + invoice.getInvoiceNum());
+            contentStream.showText("Invoice Number: " + invoice.getInvoiceID());
             contentStream.endText();
             
             yPosition -= 20;

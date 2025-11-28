@@ -33,12 +33,38 @@ public class CustomerPanel extends JPanel {
         this.system = system;
         setLayout(new BorderLayout(10, 10));
 
+        // Create signout button
+        JButton signOutButton = new JButton("Sign Out");
+        signOutButton.addActionListener(e -> signOut());
+
+        // Create top panel with signout button
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        topPanel.add(signOutButton);
+
         // Tabs for Create + Track
         JTabbedPane tabs = new JTabbedPane();
         tabs.add("Create Shipment", buildCreatePanel());
         tabs.add("Track Shipment", buildTrackPanel());
 
+        // Add components to main panel
+        add(topPanel, BorderLayout.NORTH);
         add(tabs, BorderLayout.CENTER);
+    }
+
+    private void signOut() {
+        // Clear current user from system
+        system.setCurrentUser(null, null);
+
+        // Find the SmartShipGUI frame and call showLoginPanel
+        Container parent = getParent();
+        while (parent != null && !(parent instanceof SmartShipGUI)) {
+            parent = parent.getParent();
+        }
+
+        if (parent instanceof SmartShipGUI) {
+            SmartShipGUI gui = (SmartShipGUI) parent;
+            gui.showLoginPanel();
+        }
     }
 
     // ---------------- CREATE SHIPMENT TAB ------------------

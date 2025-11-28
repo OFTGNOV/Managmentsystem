@@ -65,6 +65,19 @@ public class SmartShipGUI extends JFrame {
         }
     }
 
+    public void showLoginPanel() {
+        // Clear current user from system
+        system.setCurrentUser(null, null);
+
+        // Disable all tabs
+        for(int i = 0; i < tabbedPane.getTabCount(); i++) {
+            tabbedPane.setEnabledAt(i, false);
+        }
+
+        // Switch to login panel
+        cardLayout.show(mainPanel, "login");
+    }
+
 
 
     public static void main(String[] args) {
