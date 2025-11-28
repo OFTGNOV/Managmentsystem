@@ -13,6 +13,11 @@ public class User {
     // Salt is used for unique hashing. Means even if two users have the same password, their hashes will differ.
     protected String salt; 
     
+    // 4-parameter constructor for backward compatibility (when userType is not known)
+    public User(String Fname, String Lname, String email, String password) {
+        this(Fname, Lname, email, password, UserType.CUSTOMER); // Default to CUSTOMER
+    }
+
     ///Paramatized Contsturctor
     public User(String Fname, String Lname, String email, String password, UserType userType) {
     	this.ID = 0; // default ID, database layer should set this appropriately
@@ -122,5 +127,21 @@ public class User {
         this.passwordHash = passwordHash;
         this.salt = salt;
     }
-    
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getZone() {
+        return zone;
+    }
+
+    public void setZone(int zone) {
+        this.zone = zone;
+    }
+
 }

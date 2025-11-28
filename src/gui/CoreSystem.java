@@ -27,6 +27,23 @@ public class CoreSystem {
         // Constructor - no sample data needed, rely on actual database content
     }
 
+    private UserType mapCategoryToUserType(String category) {
+        if (category == null) return UserType.CUSTOMER;
+
+        switch (category.toLowerCase()) {
+            case "customer":
+                return UserType.CUSTOMER;
+            case "clerk":
+                return UserType.CLERK;
+            case "manager":
+                return UserType.MANAGER;
+            case "driver":
+                return UserType.DRIVER;
+            default:
+                return UserType.CUSTOMER; // default to customer
+        }
+    }
+
     // ------------------------------------------------------
     // USER AUTHENTICATION
     // ------------------------------------------------------
@@ -39,30 +56,17 @@ public class CoreSystem {
             }
 
             // Create user based on category
-            switch (category.toLowerCase()) {
-                case "customer":
-                    Customer customer = new Customer(fname, lname, uid, pwd, "Default Address", 1);
-                    CustomerDAO.insertCustomerRecord(customer);
-                    return true;
-                case "clerk":
-                    // Create a clerk user - in the original design, this would be a subclass of User
-                    // For now, using the base User class with the email as identifier
-                    UserDAO.insertUserRecord(fname, lname, uid, pwd);
-                    return true;
-                case "manager":
-                    // Create a manager user
-                    UserDAO.insertUserRecord(fname, lname, uid, pwd);
-                    return true;
-                case "driver":
-                    // Create a driver user
-                    Driver driver = new Driver(fname, lname, uid, pwd, "DL" + System.currentTimeMillis());
-                    // Note: In a complete implementation, you would have DriverDAO.insertDriverRecord(driver)
-                    // For now, we'll use the base UserDAO since a Driver extends User
-                    UserDAO.insertUserRecord(driver);
-                    return true;
-                default:
-                    return false;
+            UserType userType = mapCategoryToUserType(category);
+            User user = new User(fname, lname, uid, pwd, userType);
+
+            // Set default values for customer-specific fields if needed
+            if (userType == UserType.CUSTOMER) {
+                user.setAddress("Default Address");
+                user.setZone(1);
             }
+
+            UserDAO.insertUserRecord(user);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -78,8 +82,10 @@ public class CoreSystem {
                 return false;
             }
 
-            Customer customer = new Customer(fname, lname, email, password, address, zone);
-            CustomerDAO.insertCustomerRecord(customer);
+            User customer = new User(fname, lname, email, password, UserType.CUSTOMER);
+            customer.setAddress(address);
+            customer.setZone(zone);
+            UserDAO.insertUserRecord(customer);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,8 +101,11 @@ public class CoreSystem {
                 return false;
             }
 
-            Driver driver = new Driver(fname, lname, email, password, driverLicenseNumber);
-            DriverDAO.insertDriverRecord(driver);
+            User driver = new User(fname, lname, email, password, UserType.DRIVER);
+            // Note: In the new design, we might need to store driver license in address field or create another field
+            // For now, we'll use the address field to store the license if needed,
+            // but in a proper refactored implementation, we could expand the User class
+            UserDAO.insertUserRecord(driver);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,64 +115,17 @@ public class CoreSystem {
 
     public boolean authenticate(String uid, String pwd, String category) {
         try {
-            User user = null;
+            // Look up user by email
+            User user = UserDAO.retrieveUserRecordByEmail(uid);
 
-            // Look up user based on category
-            switch (category.toLowerCase()) {
-                case "customer":
-                    // For customers, we need to look them up by email (which is the uid in the GUI)
-                    // The customer ID format is different from email, so we look up by email
-                    user = UserDAO.retrieveUserRecordByEmail(uid);
-                    if (user != null && user.verifyPassword(pwd)) {
-                        // Load full customer details using the email to find the Customer record
-                        Customer customer = CustomerDAO.retrieveCustomerByEmail(uid);
-                        if (customer != null) {
-                            this.currentUser = customer;
-                            this.currentUserCategory = category;
-                            return true;
-                        } else {
-                            // If customer record not found in customer table, use the user record
-                            this.currentUser = user;
-                            this.currentUserCategory = category;
-                            return true;
-                        }
-                    }
-                    break;
-                case "clerk":
-                    user = UserDAO.retrieveUserRecordByEmail(uid);
-                    if (user != null && user.verifyPassword(pwd)) {
-                        this.currentUser = user;
-                        this.currentUserCategory = category;
-                        return true;
-                    }
-                    break;
-                case "manager":
-                    user = UserDAO.retrieveUserRecordByEmail(uid);
-                    if (user != null && user.verifyPassword(pwd)) {
-                        this.currentUser = user;
-                        this.currentUserCategory = category;
-                        return true;
-                    }
-                    break;
-                case "driver":
-                    user = UserDAO.retrieveUserRecordByEmail(uid);
-                    if (user != null && user.verifyPassword(pwd)) {
-                        // Load full driver details using the user ID to find the Driver record
-                        Driver driver = DriverDAO.retrieveDriverById(user.getID());
-                        if (driver != null) {
-                            this.currentUser = driver;
-                            this.currentUserCategory = category;
-                            return true;
-                        } else {
-                            // If driver record not found in driver table, use the user record
-                            this.currentUser = user;
-                            this.currentUserCategory = category;
-                            return true;
-                        }
-                    }
-                    break;
-                default:
-                    return false;
+            if (user != null && user.verifyPassword(pwd)) {
+                // Verify the user type matches the category
+                UserType expectedType = mapCategoryToUserType(category);
+                if (user.getUserType() == expectedType) {
+                    this.currentUser = user;
+                    this.currentUserCategory = category;
+                    return true;
+                }
             }
             return false;
         } catch (Exception e) {
@@ -192,20 +154,24 @@ public class CoreSystem {
                                    String description) {
         try {
             // Use the current logged-in customer as sender, or create a new customer if needed
-            Customer sender;
+            User sender;
             if (currentUser != null && currentUserCategory.equalsIgnoreCase("customer")) {
                 // If current user is a customer, use their information
-                sender = (Customer) currentUser;
+                sender = currentUser;
                 sender.setAddress(pickupAddress); // Update address for this shipment
+                // Update the user in the database
+                UserDAO.updateUserRecord(sender);
             } else {
                 // Create a new customer object with provided info
                 String senderFirstName = senderName.split(" ")[0];
                 String senderLastName = senderName.split(" ").length > 1 ? senderName.split(" ")[1] : "";
                 String senderEmail = senderName.toLowerCase().replace(" ", "") + System.currentTimeMillis() + "@customer.com";
 
-                sender = new Customer(senderFirstName, senderLastName, senderEmail, "default", pickupAddress, 1);
+                sender = new User(senderFirstName, senderLastName, senderEmail, "default", UserType.CUSTOMER);
+                sender.setAddress(pickupAddress);
+                sender.setZone(1);
                 // Insert the new customer to the database
-                CustomerDAO.insertCustomerRecord(sender);
+                UserDAO.insertUserRecord(sender);
             }
 
             // For recipient, create a customer object using the destination info
@@ -213,12 +179,17 @@ public class CoreSystem {
             String recipientLastName = destAddress.split(" ").length > 1 ? destAddress.split(" ")[1] : "Customer";
             String recipientEmail = recipientFirstName.toLowerCase() + System.currentTimeMillis() + "@recipient.com";
 
-            Customer recipient = new Customer(recipientFirstName, recipientLastName, recipientEmail, "default", destAddress, 1);
+            User recipient = new User(recipientFirstName, recipientLastName, recipientEmail, "default", UserType.CUSTOMER);
+            recipient.setAddress(destAddress);
+            recipient.setZone(1);
             // Insert recipient as a customer to the database
-            CustomerDAO.insertCustomerRecord(recipient);
+            UserDAO.insertUserRecord(recipient);
 
             // Create shipment with default values (will be updated by caller)
-            Shipment s = new Shipment(sender, recipient, 1.0, 10.0, 10.0, 10.0, PackageType.STANDARD);
+            // Convert User objects to Customer objects for compatibility with Shipment class
+            Customer customerSender = new Customer((User)sender);
+            Customer customerRecipient = new Customer((User)recipient);
+            Shipment s = new Shipment(customerSender, customerRecipient, 1.0, 10.0, 10.0, 10.0, PackageType.STANDARD);
 
             // Save to database
             ShipmentDAO.insertShipmentRecord(s);
@@ -356,9 +327,10 @@ public class CoreSystem {
     // ------------------------------------------------------
     public Driver addDriver(String firstName, String lastName, String email, String password, String driverLicenseNumber) {
         try {
-            Driver driver = new Driver(firstName, lastName, email, password, driverLicenseNumber);
-            DriverDAO.insertDriverRecord(driver);
-            return driver;
+            User user = new User(firstName, lastName, email, password, UserType.DRIVER);
+            UserDAO.insertUserRecord(user);
+            // Return as Driver object for compatibility
+            return new Driver(user, driverLicenseNumber);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -367,7 +339,15 @@ public class CoreSystem {
 
     public List<Driver> listDrivers() {
         try {
-            return DriverDAO.readAllDrivers();
+            List<User> allUsers = UserDAO.readAllUsers();
+            List<Driver> drivers = new ArrayList<>();
+            for (User user : allUsers) {
+                if (user.getUserType() == UserType.DRIVER) {
+                    // Create Driver object with a default or stored DLN
+                    drivers.add(new Driver(user, "DL" + user.getID()));
+                }
+            }
+            return drivers;
         } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<>();
@@ -419,20 +399,22 @@ public class CoreSystem {
         if (currentUser == null || !currentUserCategory.equalsIgnoreCase("driver")) return result;
 
         // Get the current driver
-        Driver currentDriver = (Driver) currentUser;
+        User currentDriver = currentUser;
 
         // Get all vehicles and find those assigned to the current driver
         List<Vehicle> allVehicles = listVehicles();
         for (Vehicle v : allVehicles) {
-            if (v.getAssignedDriver() != null &&
-                v.getAssignedDriver().getdln().equals(currentDriver.getdln())) {
-                // Get shipments assigned to this vehicle
-                List<shipmentModule.Shipment> shipmentsForVehicle =
-                    databaseModule.varDAO.VehicleDAO.getShipmentsForVehicle(v.getLicensePlate());
-                for (shipmentModule.Shipment s : shipmentsForVehicle) {
-                    // Only add shipments that are in transit or assigned
-                    if (s.getStatus() == ShipmentStatus.ASSIGNED || s.getStatus() == ShipmentStatus.IN_TRANSIT) {
-                        result.add(s);
+            if (v.getAssignedDriver() != null) {
+                // Compare by ID since we're using a unified User model
+                if (v.getAssignedDriver().getID() == currentDriver.getID()) {
+                    // Get shipments assigned to this vehicle
+                    List<shipmentModule.Shipment> shipmentsForVehicle =
+                        databaseModule.varDAO.VehicleDAO.getShipmentsForVehicle(v.getLicensePlate());
+                    for (shipmentModule.Shipment s : shipmentsForVehicle) {
+                        // Only add shipments that are in transit or assigned
+                        if (s.getStatus() == ShipmentStatus.ASSIGNED || s.getStatus() == ShipmentStatus.IN_TRANSIT) {
+                            result.add(s);
+                        }
                     }
                 }
             }

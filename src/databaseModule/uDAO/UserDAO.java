@@ -22,15 +22,18 @@ public class UserDAO {
 
     // Inserts a new user. On success sets the generated ID on the provided User object and returns true.
     public static void insertUserRecord(User user) {
-        String sql = "INSERT INTO `user` (Fname, Lname, email, password, salt) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO `user` (Fname, Lname, email, userType, address, zone, password, salt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setString(3, user.getEmail());
-            ps.setString(4, user.getPasswordHash());
-            ps.setString(5, user.getSalt());
+            ps.setString(4, user.getUserType().toString());
+            ps.setString(5, user.getAddress());
+            ps.setInt(6, user.getZone());
+            ps.setString(7, user.getPasswordHash());
+            ps.setString(8, user.getSalt());
 
             int affected = ps.executeUpdate();
             if (affected == 0) {
@@ -76,16 +79,19 @@ public class UserDAO {
     // Update user. If passwordHash on the provided user is non-null it will update password and salt as well.
 	public static void updateUserRecord(User user) {
 	    // Base update (without password)
-	    String sqlBase = "UPDATE `user` SET Fname = ?, Lname = ?, email = ?";
+	    String sqlBase = "UPDATE `user` SET Fname = ?, Lname = ?, email = ?, userType = ?, address = ?, zone = ?";
 	    boolean updatePassword = user.getPasswordHash() != null && user.getSalt() != null;
 	    String sql = updatePassword ? sqlBase + ", password = ?, salt = ? WHERE ID = ?" : sqlBase + " WHERE ID = ?";
-	
+
 	    try (Connection conn = DBHelper.getConnection();
 	         PreparedStatement ps = conn.prepareStatement(sql)) {
 	        ps.setString(1, user.getFirstName());
 	        ps.setString(2, user.getLastName());
 	        ps.setString(3, user.getEmail());
-	        int idx = 4;
+	        ps.setString(4, user.getUserType().toString());
+	        ps.setString(5, user.getAddress());
+	        ps.setInt(6, user.getZone());
+	        int idx = 7;
 	        if (updatePassword) {
 	            ps.setString(idx++, user.getPasswordHash());
 	            ps.setString(idx++, user.getSalt());
@@ -105,7 +111,7 @@ public class UserDAO {
 
 	// Retrieve user by ID
     public static User retrieveUserRecordById(int userId) {
-        String sql = "SELECT ID, Fname, Lname, email, password, salt FROM `user` WHERE ID = ?";
+        String sql = "SELECT ID, Fname, Lname, email, userType, address, zone, password, salt FROM `user` WHERE ID = ?";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -123,7 +129,7 @@ public class UserDAO {
 
     // Retrieve user by email
     public static User retrieveUserRecordByEmail(String email) {
-        String sql = "SELECT ID, Fname, Lname, email, password, salt FROM `user` WHERE email = ?";
+        String sql = "SELECT ID, Fname, Lname, email, userType, address, zone, password, salt FROM `user` WHERE email = ?";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
@@ -141,7 +147,7 @@ public class UserDAO {
 
     // Read all users
     public static List<User> readAllUsers() {
-        String sql = "SELECT ID, Fname, Lname, email, password, salt FROM `user`";
+        String sql = "SELECT ID, Fname, Lname, email, userType, address, zone, password, salt FROM `user`";
         List<User> users = new ArrayList<>();
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -161,11 +167,17 @@ public class UserDAO {
         String fname = rs.getString("Fname");
         String lname = rs.getString("Lname");
         String email = rs.getString("email");
+        String userTypeStr = rs.getString("userType");
+        String address = rs.getString("address");
+        int zone = rs.getInt("zone");
         String passwordHash = rs.getString("password");
         String salt = rs.getString("salt");
 
-        User u = new User(fname, lname, email, null);
+        UserType userType = UserType.valueOf(userTypeStr);
+        User u = new User(fname, lname, email, null, userType);
         u.setID(id);
+        u.setAddress(address);
+        u.setZone(zone);
         // populate passwordHash and salt using package-private helper
         // keep raw password null for security
         u.setPasswordHashAndSalt(passwordHash, salt);

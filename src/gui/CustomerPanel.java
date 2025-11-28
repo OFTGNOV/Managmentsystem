@@ -117,7 +117,7 @@ public class CustomerPanel extends JPanel {
             }
 
             // Get current logged-in customer as sender
-            Customer sender = (Customer) system.getCurrentUser();
+            Customer sender = new Customer(system.getCurrentUser());
             if (sender == null) {
                 JOptionPane.showMessageDialog(this, "Please log in as a customer to create shipments.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;

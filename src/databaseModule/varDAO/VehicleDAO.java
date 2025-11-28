@@ -28,7 +28,7 @@ public class VehicleDAO {
 
     // Inserts a new vehicle record into the database
     public static void insertVehicleRecord(Vehicle vehicle) {
-        String sql = "INSERT INTO `vehicle` (licensePlate, vehicleType, maxWeightCapacity, maxPackageCapacity, driversLicense, currentWeight, currentPackageCount, isAvailable) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO `vehicle` (licensePlate, vehicleType, maxWeightCapacity, maxPackageCapacity, driverID, currentWeight, currentPackageCount, isAvailable) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -38,9 +38,9 @@ public class VehicleDAO {
             ps.setInt(4, vehicle.getMaxPackageCapacity());
 
             if (vehicle.getAssignedDriver() != null) {
-                ps.setString(5, vehicle.getAssignedDriver().getdln());
+                ps.setInt(5, vehicle.getAssignedDriver().getID());
             } else {
-                ps.setNull(5, Types.VARCHAR);
+                ps.setNull(5, Types.INTEGER);
             }
 
             ps.setDouble(6, vehicle.getCurrentWeight());
@@ -64,7 +64,7 @@ public class VehicleDAO {
 
     // Updates an existing vehicle record in the database
     public static void updateVehicleRecord(Vehicle vehicle) {
-        String sql = "UPDATE `vehicle` SET vehicleType = ?, maxWeightCapacity = ?, maxPackageCapacity = ?, driversLicense = ?, currentWeight = ?, currentPackageCount = ?, isAvailable = ? WHERE licensePlate = ?";
+        String sql = "UPDATE `vehicle` SET vehicleType = ?, maxWeightCapacity = ?, maxPackageCapacity = ?, driverID = ?, currentWeight = ?, currentPackageCount = ?, isAvailable = ? WHERE licensePlate = ?";
 
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -74,9 +74,9 @@ public class VehicleDAO {
             ps.setInt(3, vehicle.getMaxPackageCapacity());
 
             if (vehicle.getAssignedDriver() != null) {
-                ps.setString(4, vehicle.getAssignedDriver().getdln());
+                ps.setInt(4, vehicle.getAssignedDriver().getID());
             } else {
-                ps.setNull(4, Types.VARCHAR);
+                ps.setNull(4, Types.INTEGER);
             }
 
             ps.setDouble(5, vehicle.getCurrentWeight());
@@ -120,7 +120,7 @@ public class VehicleDAO {
 
     // Retrieves a vehicle by license plate (primary key in the database)
     public static Vehicle retrieveVehicleByLicensePlate(String licensePlate) {
-        String sql = "SELECT licensePlate, vehicleType, maxWeightCapacity, maxPackageCapacity, driversLicense, currentWeight, currentPackageCount, isAvailable FROM `vehicle` WHERE licensePlate = ?";
+        String sql = "SELECT licensePlate, vehicleType, maxWeightCapacity, maxPackageCapacity, driverID, currentWeight, currentPackageCount, isAvailable FROM `vehicle` WHERE licensePlate = ?";
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, licensePlate);
@@ -138,7 +138,7 @@ public class VehicleDAO {
 
     // Retrieves all vehicles from the database
     public static List<Vehicle> readAllVehicles() {
-        String sql = "SELECT licensePlate, vehicleType, maxWeightCapacity, maxPackageCapacity, driversLicense, currentWeight, currentPackageCount, isAvailable FROM `vehicle`";
+        String sql = "SELECT licensePlate, vehicleType, maxWeightCapacity, maxPackageCapacity, driverID, currentWeight, currentPackageCount, isAvailable FROM `vehicle`";
         List<Vehicle> vehicles = new ArrayList<>();
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -158,14 +158,20 @@ public class VehicleDAO {
         String vehicleType = rs.getString("vehicleType");
         double maxWeightCapacity = rs.getDouble("maxWeightCapacity");
         int maxPackageCapacity = rs.getInt("maxPackageCapacity");
-        String driversLicense = rs.getString("driversLicense");
+        int driverID = rs.getInt("driverID");
         double currentWeight = rs.getDouble("currentWeight");
         int currentPackageCount = rs.getInt("currentPackageCount");
         boolean isAvailable = rs.getBoolean("isAvailable");
 
         Driver assignedDriver = null;
-        if (driversLicense != null && !driversLicense.isEmpty()) {
-            assignedDriver = DriverDAO.retrieveDriverByDln(driversLicense);
+        if (rs.wasNull()) {
+            // No assigned driver
+        } else {
+            // Retrieve driver by ID instead of DLN
+            User user = databaseModule.uDAO.UserDAO.retrieveUserRecordById(driverID);
+            if (user != null && user.getUserType() == userModule.UserType.DRIVER) {
+                assignedDriver = new Driver(user, "DL" + user.getID()); // Use default DLN
+            }
         }
 
         Vehicle vehicle = new Vehicle(assignedDriver, licensePlate, vehicleType, maxWeightCapacity, maxPackageCapacity);
