@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import userModule.User;
+import userModule.UserType;
+
 import javax.swing.JOptionPane;
 
 import databaseModule.DBHelper;
@@ -55,6 +57,7 @@ public class UserDAO {
             return;
         }
     }
+
 
     // Deletes a user by ID
     public static void deleteUserRecord(int userId) {

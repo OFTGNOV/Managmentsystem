@@ -67,13 +67,13 @@ public class ManagerPanel extends JPanel {
                 int maxPackages = Integer.parseInt(maxPackagesStr);
 
                 // Optionally select a driver
-                java.util.List<userModule.Driver> drivers = system.listDrivers();
-                String driverDLN = null;
+                java.util.List<userModule.User> drivers = system.listDrivers();
+                String driverEmail = null;
                 if (!drivers.isEmpty()) {
                     String[] driverOptions = new String[drivers.size()];
                     for (int i = 0; i < drivers.size(); i++) {
-                        userModule.Driver d = drivers.get(i);
-                        driverOptions[i] = d.getdln() + " - " + d.getFirstName() + " " + d.getLastName();
+                        userModule.User d = drivers.get(i);
+                        driverOptions[i] = d.getEmail() + " - " + d.getFirstName() + " " + d.getLastName();
                     }
 
                     String selectedDriver = (String) JOptionPane.showInputDialog(
@@ -87,12 +87,12 @@ public class ManagerPanel extends JPanel {
                     );
 
                     if (selectedDriver != null) {
-                        // Extract the driver license number from the selection
-                        driverDLN = selectedDriver.split(" - ")[0];
+                        // Extract the driver email from the selection (used as identifier)
+                        driverEmail = selectedDriver.split(" - ")[0];
                     }
                 }
 
-                vehicleAndRoutingModule.Vehicle vehicle = system.addVehicle(licensePlate, maxWeight, maxPackages, driverDLN);
+                vehicleAndRoutingModule.Vehicle vehicle = system.addVehicle(licensePlate, maxWeight, maxPackages, driverEmail);
                 if (vehicle != null) {
                     JOptionPane.showMessageDialog(this, "Vehicle added successfully!");
                 } else {
@@ -125,7 +125,7 @@ public class ManagerPanel extends JPanel {
                 String driverLicense = JOptionPane.showInputDialog(this, "Enter driver's license number:");
                 if (driverLicense == null || driverLicense.trim().isEmpty()) return;
 
-                userModule.Driver driver = system.addDriver(firstName, lastName, email, password, driverLicense);
+                userModule.User driver = system.addDriver(firstName, lastName, email, password, driverLicense);
                 if (driver != null) {
                     JOptionPane.showMessageDialog(this, "Driver added successfully!");
                 } else {

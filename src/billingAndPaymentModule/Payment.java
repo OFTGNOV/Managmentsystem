@@ -157,37 +157,4 @@ public class Payment {
     public void setInvoiceNum(String invoiceNum) {
         this.invoiceNum = invoiceNum;
     }
-
-    // Override equals method to compare Payment objects.
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Payment payment = (Payment) o;
-        return paymentId == payment.paymentId &&
-               Double.compare(payment.amount, amount) == 0 &&
-               Objects.equals(paymentDate, payment.paymentDate) &&
-               paymentMethod == payment.paymentMethod &&
-               status == payment.status &&
-               Objects.equals(referenceNumber, payment.referenceNumber) &&
-               Objects.equals(invoiceNum, payment.invoiceNum);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(paymentId, amount, paymentDate, paymentMethod, status, referenceNumber, invoiceNum);
-    }
-
-    @Override
-    public String toString() {
-        return "Payment{" +
-                "paymentId=" + paymentId +
-                ", amount=" + amount +
-                ", paymentDate=" + paymentDate +
-                ", paymentMethod=" + paymentMethod +
-                ", status=" + status +
-                ", referenceNumber='" + referenceNumber + '\'' +
-                ", invoiceNum='" + invoiceNum + '\'' +
-                '}';
-    }
 }

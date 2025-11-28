@@ -12,8 +12,6 @@ import databaseModule.DBHelper;
 import databaseModule.sDAO.ShipmentDAO;
 import vehicleAndRoutingModule.Vehicle;
 import userModule.User;
-import userModule.UserType;
-import databaseModule.uDAO.UserDAO;
 
 /* Data Access Object for Vehicle entity
  * Provides methods to perform CRUD operations on Vehicle data in the database

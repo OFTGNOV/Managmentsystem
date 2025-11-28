@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 public class InvoiceDAO {
 
     // Insert Invoice Record with parameters
-    public static void insertInvoiceRecord(Shipment shipment, String senderId, String recipentId,
+    public static void insertInvoiceRecord(Shipment shipment, int senderId, int recipentId,
             double totalAmount, LocalDateTime issueDate, LocalDateTime dueDate,
             InvoiceStatus status, String notes) {
     	// Create Invoice object
@@ -33,8 +33,8 @@ public class InvoiceDAO {
 
             ps.setString(1, invoice.getInvoiceNum());
             ps.setString(2, invoice.getShipment().getTrackingNumber());
-            ps.setString(3, invoice.getSenderId());
-            ps.setString(4, invoice.getRecipentId());
+            ps.setInt(3, invoice.getSenderId());
+            ps.setInt(4, invoice.getRecipentId());
             ps.setDouble(5, invoice.getTotalAmount());
             ps.setTimestamp(6, invoice.getIssueDate() == null ? null : Timestamp.valueOf(invoice.getIssueDate()));
             ps.setTimestamp(7, invoice.getDueDate() == null ? null : Timestamp.valueOf(invoice.getDueDate()));
@@ -62,8 +62,8 @@ public class InvoiceDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, invoice.getShipment().getTrackingNumber());
-            ps.setString(2, invoice.getSenderId());
-            ps.setString(3, invoice.getRecipentId());
+            ps.setInt(2, invoice.getSenderId());
+            ps.setInt(3, invoice.getRecipentId());
             ps.setDouble(4, invoice.getTotalAmount());
             ps.setTimestamp(5, Timestamp.valueOf(invoice.getIssueDate()));
             ps.setTimestamp(6, Timestamp.valueOf(invoice.getDueDate()));
@@ -177,8 +177,8 @@ public class InvoiceDAO {
     private static Invoice mapResultSetToInvoice(ResultSet rs) throws SQLException {
         String invoiceNum = rs.getString("invoiceNum");
         String shipmentTrackingNumber = rs.getString("shipment_trackingNumber");
-        String senderId = rs.getString("senderId");
-        String recipentId = rs.getString("recipentId");
+        int senderId = rs.getInt("senderId");
+        int recipentId = rs.getInt("recipentId");
         double totalAmount = rs.getDouble("totalAmount");
         Timestamp issueDateTs = rs.getTimestamp("issueDate");
         Timestamp dueDateTs = rs.getTimestamp("dueDate");

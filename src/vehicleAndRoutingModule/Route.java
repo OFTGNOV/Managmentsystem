@@ -233,18 +233,4 @@ public class Route {
         return total;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Route #").append(routeNum).append(" (Zone: ").append(zone).append(")\n");
-        if (vehicle != null && vehicle.getAssignedDriver() != null) {
-            Driver d = vehicle.getAssignedDriver();
-            sb.append("Driver: ").append(d.getdln()).append("\n");
-        }
-        sb.append("Planned Shipments: ").append(getPlannedShipmentCount()).append("\n");
-        sb.append("Total Planned Weight: ").append(getTotalPlannedWeight()).append(" kg\n");
-        sb.append("Start: ").append(startTime).append(" End: ").append(endTime);
-        return sb.toString();
-    }
-
 }

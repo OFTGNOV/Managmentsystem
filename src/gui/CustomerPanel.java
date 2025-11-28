@@ -116,17 +116,17 @@ public class CustomerPanel extends JPanel {
                 return;
             }
 
-            // Get current logged-in customer as sender
-            Customer sender = new Customer(system.getCurrentUser());
-            if (sender == null) {
+            // Get current logged-in user as sender (should be of type CUSTOMER)
+            User sender = system.getCurrentUser();
+            if (sender == null || sender.getUserType() != UserType.CUSTOMER) {
                 JOptionPane.showMessageDialog(this, "Please log in as a customer to create shipments.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // Look up recipient in database by email
-            Customer recipient = databaseModule.uDAO.CustomerDAO.retrieveCustomerByEmail(recipientEmail);
-            if (recipient == null) {
-                JOptionPane.showMessageDialog(this, "Recipient with email " + recipientEmail + " not found in the system.", "Error", JOptionPane.ERROR_MESSAGE);
+            User recipient = databaseModule.uDAO.UserDAO.retrieveUserRecordByEmail(recipientEmail);
+            if (recipient == null || recipient.getUserType() != UserType.CUSTOMER) {
+                JOptionPane.showMessageDialog(this, "Recipient with email " + recipientEmail + " not found in the system or not a customer.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 

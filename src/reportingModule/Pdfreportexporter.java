@@ -423,7 +423,7 @@ public class Pdfreportexporter {
             contentStream.showText("From:");
             contentStream.endText();
             
-            if (invoice.getSenderId() != null) {
+            if (invoice.getSenderId() > 0) {
                 userModule.User sender = databaseModule.uDAO.UserDAO.retrieveUserRecordById(invoice.getSenderId());
                 if (sender != null) {
                     yPosition -= 20;
@@ -449,7 +449,7 @@ public class Pdfreportexporter {
                     contentStream.beginText();
                     contentStream.setFont(normalFont, 12);
                     contentStream.newLineAtOffset(70, yPosition);
-                    contentStream.showText("Customer ID: " + invoice.getSenderId());
+                    contentStream.showText("User ID: " + invoice.getSenderId());
                     contentStream.endText();
                 }
             }
@@ -462,7 +462,7 @@ public class Pdfreportexporter {
             contentStream.showText("To:");
             contentStream.endText();
             
-            if (invoice.getRecipentId() != null) {
+            if (invoice.getRecipentId() > 0) {
                 userModule.User recipient = databaseModule.uDAO.UserDAO.retrieveUserRecordById(invoice.getRecipentId());
                 if (recipient != null) {
                     yPosition -= 20;
@@ -645,7 +645,7 @@ public class Pdfreportexporter {
         
         List<Invoice> allInvoices = InvoiceDAO.readAllInvoices();
         for (Invoice invoice : allInvoices) {
-            if (invoice.getIssueDate() != null && invoice.getRecipentId() != null) {
+            if (invoice.getIssueDate() != null && invoice.getRecipentId() > 0) {
                 LocalDate issueDate = invoice.getIssueDate().toLocalDate();
                 if (!issueDate.isBefore(startDate) && !issueDate.isAfter(endDate)) {
                     // Need to get user by ID to get the zone

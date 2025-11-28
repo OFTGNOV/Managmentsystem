@@ -123,21 +123,6 @@ public class Shipment {
         }
     }
     
-    @Override
-    public String toString() {
-        return "Shipment - trackingNumber=" + trackingNumber +
-                ", \nSender: " + sender.getID()+
-                ", \nRecipent: " + recipent.getID() +
-                ", \nweight: " + weight +
-                "kg, \nlength: " + length +
-                "cm, \nwidth: " + width +
-                "cm, \nheight: " + height +
-                "cm, \nPackage Type: " + pType +
-                ", \nStatus: " + status +
-                String.format(", \nShipping Cost: $%.2f", shippingCost) +
-                ", \nCreated Date: " + createdDate +
-                ", \nDelivered Date: " + deliveredDate;
-    }
     
     // Listener management
     public void addStatusListener(ShipmentStatusListener listener) {
