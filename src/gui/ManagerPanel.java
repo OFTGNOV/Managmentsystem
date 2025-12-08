@@ -265,6 +265,22 @@ public class ManagerPanel extends JPanel {
         refreshReport();
     }
 
+    private SmartShipGUI guiParent;
+
+    public void setGuiParent(SmartShipGUI gui) {
+        this.guiParent = gui;
+    }
+
+    private void signOut() {
+        // Call signout to clear the user from the system
+        system.signOut();
+
+        // Call the SmartShipGUI's showLoginPanel method
+        if (guiParent != null) {
+            guiParent.showLoginPanel();
+        }
+    }
+
     private void refreshReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("Shipments by status:\n\n");
@@ -286,22 +302,6 @@ public class ManagerPanel extends JPanel {
                     s.getStatus(),
                     s.getWeight()
             });
-        }
-    }
-
-    private void signOut() {
-        // Clear current user from system
-        system.setCurrentUser(null, null);
-
-        // Find the SmartShipGUI frame and call showLoginPanel
-        Container parent = getParent();
-        while (parent != null && !(parent instanceof SmartShipGUI)) {
-            parent = parent.getParent();
-        }
-
-        if (parent instanceof SmartShipGUI) {
-            SmartShipGUI gui = (SmartShipGUI) parent;
-            gui.showLoginPanel();
         }
     }
 }

@@ -30,7 +30,7 @@ public class User {
         // hash and store the provided password (can be null)
         setPassword(password);
     }
-    
+
     //copy constructor
     public User(User other) {
         this.Fname = other.Fname;
@@ -41,7 +41,7 @@ public class User {
         this.zone = other.zone;
         this.passwordHash = other.passwordHash;
         this.salt = other.salt;
-     
+
     }
     
     // Simple helpers that use PasswordHasher (PBKDF2) defined in the same package.

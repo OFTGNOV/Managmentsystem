@@ -37,6 +37,12 @@ public class SmartShipGUI extends JFrame {
         managerPanel = new ManagerPanel(system);
         driverPanel = new DriverPanel(system);
 
+        // Set the GUI parent reference for all panels
+        customerPanel.setGuiParent(this);
+        clerkPanel.setGuiParent(this);
+        managerPanel.setGuiParent(this);
+        driverPanel.setGuiParent(this);
+
         // Create login and signup panels
         loginPanel = new LoginPanel(system, tabbedPane);
         signupPanel = new SignupPanel(system);
@@ -55,6 +61,9 @@ public class SmartShipGUI extends JFrame {
         for(int i=0; i<tabbedPane.getTabCount(); i++) {
             tabbedPane.setEnabledAt(i, false);
         }
+
+        // Add the tabbed pane to the main panel as well, so it can be shown by CardLayout
+        mainPanel.add(tabbedPane, "tabs");
 
         // Show login panel initially
         add(mainPanel, BorderLayout.CENTER);

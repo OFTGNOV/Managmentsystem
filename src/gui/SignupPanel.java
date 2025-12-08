@@ -136,17 +136,8 @@ public class SignupPanel extends JPanel {
                         int zone = Integer.parseInt((String) zoneCombo.getSelectedItem());
                         created = system.signUpCustomer(fname, lname, email, pwd, address, zone);
                         break;
-                    case "Driver":
-                        String dln = txtDLN.getText().trim();
-                        if(dln.isEmpty()) {
-                            JOptionPane.showMessageDialog(SignupPanel.this, "Driver License Number is required for drivers", "Error", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                        created = system.signUpDriver(fname, lname, email, pwd, dln);
-                        break;
-                    case "Clerk":
-                    case "Manager":
-                        // Use generic signup for clerk and manager
+                    case "Driver": case "Clerk": case "Manager":
+                        // Use generic signup for clerk, driver and manager
                         created = system.signUpUser(email, fname, lname, pwd, category);
                         break;
                 }

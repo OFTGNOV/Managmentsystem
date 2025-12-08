@@ -91,7 +91,7 @@ public class PaymentDAO {
 
     // Get all payments
     public static List<Payment> readAllPayments() {
-        String sql = "SELECT paymentId, amount, paymentDate, paymentMethod, status, referenceNumber, invoiceNum FROM payment";
+        String sql = "SELECT paymentId, amount, paymentDate, paymentMethod, status, referenceNumber, invoiceID FROM payment";
         List<Payment> payments = new ArrayList<>();
         try (Connection conn = DBHelper.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);

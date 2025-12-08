@@ -52,11 +52,6 @@ public class LoginPanel extends JPanel {
                 boolean authenticated = system.authenticate(email, pwd, category);
                 if(authenticated) {
                     JOptionPane.showMessageDialog(LoginPanel.this, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    
-                    // Replace the main panel with the tabbed pane after successful login
-                    Container parent = getParent();
-                    parent.removeAll();
-                    parent.setLayout(new BorderLayout());
 
                     // Enable only the selected category tab and switch
                     for(int i=0; i<tabbedPane.getTabCount(); i++) {
@@ -82,9 +77,10 @@ public class LoginPanel extends JPanel {
                             break;
                     }
 
-                    parent.add(tabbedPane, BorderLayout.CENTER);
-                    parent.revalidate();
-                    parent.repaint();
+                    // Add the tabbed pane to the parent panel (which has CardLayout) and show it
+                    Container parent = getParent();
+                    parent.add(tabbedPane, "tabs"); // Add with a "tabs" identifier
+                    ((CardLayout) parent.getLayout()).show(parent, "tabs");
                 } else {
                     JOptionPane.showMessageDialog(LoginPanel.this, "Invalid credentials", "Error", JOptionPane.ERROR_MESSAGE);
                 }

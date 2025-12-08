@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.Container;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class CoreSystem {
     }
 
     // ------------------------------------------------------
-    // USER AUTHENTICATION
+    // USER AUTHENTICATION and Signing Out
     // ------------------------------------------------------
     public boolean signUpUser(String uid, String fname, String lname, String pwd, String category) {
         try {
@@ -145,6 +146,15 @@ public class CoreSystem {
 
     public String getCurrentUserCategory() {
         return this.currentUserCategory;
+    }
+    
+    /**
+     * Public method for signing out, returns true when successfully signed out
+     */
+    public boolean signOut() {
+        // Clear current user from system
+        setCurrentUser(null, null);
+        return true;
     }
 
     // ------------------------------------------------------

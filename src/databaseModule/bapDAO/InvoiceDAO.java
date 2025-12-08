@@ -29,7 +29,7 @@ public class InvoiceDAO {
     public static void insertInvoiceRecord(Invoice invoice) {
         String sql = "INSERT INTO invoice (shipment_trackingNumber, senderId, recipentId, totalAmount, issueDate, dueDate, status, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBHelper.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, invoice.getShipment().getTrackingNumber());
             ps.setInt(2, invoice.getSenderId());

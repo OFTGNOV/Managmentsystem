@@ -1,9 +1,10 @@
 package gui;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
-
 import shipmentModule.*;
 import userModule.*;
 import billingAndPaymentModule.*;
@@ -23,11 +24,15 @@ public class CustomerPanel extends JPanel {
 
     private final JComboBox<String> typeBox = new JComboBox<>(new String[]{"STANDARD", "EXPRESS", "FRAGILE"});
 
-    private final DefaultListModel<String> createdModel = new DefaultListModel<>();
+    // Table for displaying shipments
+    private JTable shipmentTable;
+    private DefaultTableModel shipmentTableModel;
 
     // Track Shipment Fields
     private final JTextField trackingSearchField = new JTextField(15);
     private final JTextArea trackingResultArea = new JTextArea(8, 30);
+
+    private SmartShipGUI guiParent;
 
     public CustomerPanel(CoreSystem system) {
         this.system = system;
@@ -51,19 +56,17 @@ public class CustomerPanel extends JPanel {
         add(tabs, BorderLayout.CENTER);
     }
 
+    public void setGuiParent(SmartShipGUI gui) {
+        this.guiParent = gui;
+    }
+
     private void signOut() {
-        // Clear current user from system
-        system.setCurrentUser(null, null);
+        // Call signout to clear the user from the system
+        system.signOut();
 
-        // Find the SmartShipGUI frame and call showLoginPanel
-        Container parent = getParent();
-        while (parent != null && !(parent instanceof SmartShipGUI)) {
-            parent = parent.getParent();
-        }
-
-        if (parent instanceof SmartShipGUI) {
-            SmartShipGUI gui = (SmartShipGUI) parent;
-            gui.showLoginPanel();
+        // Call the SmartShipGUI's showLoginPanel method
+        if (guiParent != null) {
+            guiParent.showLoginPanel();
         }
     }
 
@@ -71,6 +74,7 @@ public class CustomerPanel extends JPanel {
     private JPanel buildCreatePanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
 
+        // Creation form
         JPanel form = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(6, 6, 6, 6);
@@ -97,17 +101,50 @@ public class CustomerPanel extends JPanel {
         JButton createBtn = new JButton("Create Shipment");
         createBtn.addActionListener(this::createShipment);
 
-        panel.add(form, BorderLayout.NORTH);
-        panel.add(createBtn, BorderLayout.CENTER);
+        // Add form to top section
+        JPanel creationPanel = new JPanel(new BorderLayout());
+        creationPanel.add(form, BorderLayout.CENTER);
+        creationPanel.add(createBtn, BorderLayout.SOUTH);
 
-        JList<String> list = new JList<>(createdModel);
-        panel.add(new JScrollPane(list), BorderLayout.SOUTH);
+        // Create shipment table
+        String[] columnNames = {"Tracking Number", "Recipient", "Destination", "Status", "Cost", "Created Date"};
+        shipmentTableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make table read-only
+            }
+        };
+        shipmentTable = new JTable(shipmentTableModel);
+        JScrollPane tableScrollPane = new JScrollPane(shipmentTable);
+
+        // Add export invoice button
+        JPanel buttonPanel = new JPanel();
+        JButton exportInvoiceBtn = new JButton("Export Invoice for Selected");
+        exportInvoiceBtn.addActionListener(e -> exportInvoiceForSelected());
+        buttonPanel.add(exportInvoiceBtn);
+
+        // Refresh button to reload shipments
+        JButton refreshBtn = new JButton("Refresh Shipments");
+        refreshBtn.addActionListener(e -> loadCustomerShipments());
+        buttonPanel.add(refreshBtn);
+
+        // Add the creation form and buttons to top
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(creationPanel, BorderLayout.CENTER);
+        topPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        panel.add(topPanel, BorderLayout.NORTH); // Add form and buttons at the top
+        panel.add(tableScrollPane, BorderLayout.CENTER);
+
+        // Load initial shipments
+        loadCustomerShipments();
 
         return panel;
     }
 
     // ---------------- SHIPMENT CREATION + PAYMENT ------------------
-    private void createShipment(ActionEvent e) {
+    @SuppressWarnings("unused")
+	private void createShipment(ActionEvent e) {
         try {
             String recipientEmail = recipientEmailField.getText().trim();
             String typeStr = (String) typeBox.getSelectedItem();
@@ -178,7 +215,7 @@ public class CustomerPanel extends JPanel {
             Invoice invoice = new Invoice(savedShipment);
             databaseModule.bapDAO.InvoiceDAO.insertInvoiceRecord(invoice);
 
-            if (invoice == null || invoice.getInvoiceNum() == null) {
+            if (invoice == null) {
                 JOptionPane.showMessageDialog(this, "Failed to create invoice", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -212,7 +249,7 @@ public class CustomerPanel extends JPanel {
                             paymentMethod,
                             billingAndPaymentModule.PaymentStatus.PENDING,
                             null, // referenceNumber will be generated
-                            invoice.getInvoiceNum()); // Use the invoice number
+                            invoice.getInvoiceID()); // Use the invoice number
 
                         // Process cash payment
                         payment.processCashPayment();
@@ -248,7 +285,7 @@ public class CustomerPanel extends JPanel {
                             paymentMethod,
                             billingAndPaymentModule.PaymentStatus.SUCCESS,
                             null, // referenceNumber will be generated
-                            invoice.getInvoiceNum()); // Use the invoice number
+                            invoice.getInvoiceID()); // Use the invoice number
 
                         payment.processPayment(totalCost, billingAndPaymentModule.PaymentMethod.CARD);
 
@@ -265,7 +302,16 @@ public class CustomerPanel extends JPanel {
                 InvoiceDAO.updateInvoiceRecord(invoice);
             }
 
-            createdModel.addElement("Created: " + shipment.getTrackingNumber() + " | Cost: $" + String.format("%.2f", totalCost));
+            // Add the new shipment to the table
+            shipmentTableModel.addRow(new Object[]{
+                    shipment.getTrackingNumber(),
+                    shipment.getRecipent().getFirstName() + " " + shipment.getRecipent().getLastName(),
+                    shipment.getRecipent().getAddress(),
+                    shipment.getStatus(),
+                    "$" + String.format("%.2f", totalCost),
+                    shipment.getCreatedDate() != null ? shipment.getCreatedDate() : "N/A"
+            });
+
             JOptionPane.showMessageDialog(this, "Shipment Created!\nTracking Number: " + shipment.getTrackingNumber());
 
             // Clear fields
@@ -329,6 +375,76 @@ public class CustomerPanel extends JPanel {
                 "Package Type: " + s.getpType() + "\n" +
                 "Cost: $" + String.format("%.2f", s.getShippingCost())
         );
+    }
+
+    // Load all shipments for the current customer
+    private void loadCustomerShipments() {
+        // Clear current table
+        shipmentTableModel.setRowCount(0);
+
+        // Get all shipments and filter for current customer
+        User currentUser = system.getCurrentUser();
+        if (currentUser == null) {
+            return;
+        }
+
+        java.util.List<shipmentModule.Shipment> allShipments = system.listShipments();
+        for (shipmentModule.Shipment s : allShipments) {
+            // Only show shipments where the current user is the sender
+            if (s.getSender().getID() == currentUser.getID()) {
+                shipmentTableModel.addRow(new Object[]{
+                        s.getTrackingNumber(),
+                        s.getRecipent().getFirstName() + " " + s.getRecipent().getLastName(),
+                        s.getRecipent().getAddress(),
+                        s.getStatus(),
+                        "$" + String.format("%.2f", s.getShippingCost()),
+                        s.getCreatedDate() != null ? s.getCreatedDate() : "N/A"
+                });
+            }
+        }
+    }
+
+    // Export invoice for selected shipment
+    private void exportInvoiceForSelected() {
+        int selectedRow = shipmentTable.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a shipment to export invoice", "No Selection", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Get the tracking number from the selected row
+        String trackingNumber = (String) shipmentTableModel.getValueAt(selectedRow, 0);
+
+        // Get the shipment from the system using tracking number
+        shipmentModule.Shipment shipment = system.getShipment(trackingNumber);
+        if (shipment == null) {
+            JOptionPane.showMessageDialog(this, "Shipment not found", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Find the invoice for this shipment
+        java.util.List<billingAndPaymentModule.Invoice> invoices =
+            databaseModule.bapDAO.InvoiceDAO.retrieveInvoicesByShipment(trackingNumber);
+
+        if (invoices.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No invoice found for this shipment", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Use the first invoice (there should typically be one invoice per shipment)
+        billingAndPaymentModule.Invoice invoice = invoices.get(0);
+
+        // Generate file name based on invoice and shipment
+        String fileName = "Invoice_" + invoice.getInvoiceID() + "_" + trackingNumber + ".pdf";
+
+        // Try to save the invoice using the reporting module
+        try {
+            reportingModule.ReportManager.exportInvoiceAsPDF(invoice, fileName);
+            JOptionPane.showMessageDialog(this, "Invoice exported successfully to: " + fileName, "Success", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error exporting invoice: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
 
     public CoreSystem getSystem() { return system; }

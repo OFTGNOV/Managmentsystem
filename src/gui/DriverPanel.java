@@ -48,6 +48,22 @@ public class DriverPanel extends JPanel {
         loadDeliveries();
     }
 
+    private SmartShipGUI guiParent;
+
+    public void setGuiParent(SmartShipGUI gui) {
+        this.guiParent = gui;
+    }
+
+    private void signOut() {
+        // Call signout to clear the user from the system
+        system.signOut();
+
+        // Call the SmartShipGUI's showLoginPanel method
+        if (guiParent != null) {
+            guiParent.showLoginPanel();
+        }
+    }
+
     // Load assigned deliveries from CoreSystem
     private void loadDeliveries() {
         tableModel.setRowCount(0); // clear table
@@ -89,14 +105,14 @@ public class DriverPanel extends JPanel {
                     JOptionPane.showMessageDialog(this, "Invalid status: " + newStatusStr, "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                
+
                 // Update the shipment status through CoreSystem
                 boolean updated = system.updateShipmentStatus(trackingNumber, newStatus.toString());
                 if (!updated) {
                     JOptionPane.showMessageDialog(this, "Failed to update shipment status in database", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                
+
                 loadDeliveries(); // refresh table
                 JOptionPane.showMessageDialog(this, "Shipment status updated successfully!");
             }
@@ -105,19 +121,4 @@ public class DriverPanel extends JPanel {
         }
     }
 
-    private void signOut() {
-        // Clear current user from system
-        system.setCurrentUser(null, null);
-
-        // Find the SmartShipGUI frame and call showLoginPanel
-        Container parent = getParent();
-        while (parent != null && !(parent instanceof SmartShipGUI)) {
-            parent = parent.getParent();
-        }
-
-        if (parent instanceof SmartShipGUI) {
-            SmartShipGUI gui = (SmartShipGUI) parent;
-            gui.showLoginPanel();
-        }
-    }
 }
